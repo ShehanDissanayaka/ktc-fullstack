@@ -11,15 +11,9 @@ SECRET_KEY = os.environ.get(
     "django-insecure-p8dn&&na8r2weuu#6e)@0%s*ykk*(-xtrya%l@4!&0e!v&qyg*"
 )
 
-# DEBUG
-DEBUG = os.environ.get("DEBUG", "True") == "True"
+DEBUG = True
+ALLOWED_HOSTS = ['*']
 
-# ALLOWED HOSTS
-ALLOWED_HOSTS = [
-    'ktc-fullstack-production.up.railway.app',
-    '127.0.0.1',
-    'localhost',
-]
 
 # APPLICATIONS
 INSTALLED_APPS = [
