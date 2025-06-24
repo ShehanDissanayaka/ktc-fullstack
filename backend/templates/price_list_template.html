@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        @page {
+            margin: 20px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 16pt;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 5px;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #eee;
+            text-align: center;
+        }
+
+        .yellow {
+            background-color: yellow;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .center {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>KTC INVENTORY - PRICE LIST</h1>
+    <p>Generated: {{ now|date:"Y-m-d H:i" }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>IMAGE</th>
+                <th>DESCRIPTION</th>
+                <th>UNIT PRICE</th>
+                <th>DISCOUNT/SPECIAL PRICE</th>
+                <th>LABEL TAG / INVOICE</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td class="center">{{ item.no }}</td>
+                <td class="center">
+                    {% if item.image_base64 %}
+                    <img src="data:image/png;base64,{{ item.image_base64 }}"
+                        style="max-width: 100px; max-height: 100px; object-fit: contain;" />
+                    {% else %}
+                    No Image
+                    {% endif %}
+                </td>
+                <td>{{ item.description|safe }}</td>
+                <td class="center">{{ item.price }}</td>
+                <td class="center">{{ item.special_price }}</td>
+                <td class="center">{{ item.label_tag|safe }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+
+</html>

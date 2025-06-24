@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12pt; }
+        .title { font-weight: bold; font-size: 16pt; }
+        .model { font-weight: bold; font-size: 14pt; }
+        .spec { font-weight: bold; color: red; font-size: 14pt; }
+        .section { margin-top: 15px; }
+        .label { font-weight: bold; }
+        .note-red { color: red; font-weight: bold; }
+        img { width: 300px; height: auto; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="title">{{ item.ITEM_name }}</div>
+    <div class="model">Model No: {{ item.ITEM_model_number }}</div>
+    <div class="spec">Spec/Capacity: {{ item.ITEM_spec }}</div>
+
+    {% if item.ITEM_type == "warranty" %}
+        <div class="section">
+            <div>Power: {{ item.power }}</div>
+            <div>Voltage: {{ item.voltage }}</div>
+            <div>Temp. Range: {{ item.temp_range }}</div>
+            <div>Housing Material: {{ item.housing_material }}</div>
+        </div>
+    {% endif %}
+
+    <div class="section">
+        {% if item.ITEM_notes %}
+            {% if item.ITEM_notes.0 %}<div class="note-red">Special Note 01: {{ item.ITEM_notes.0 }}</div>{% endif %}
+            {% if item.ITEM_notes.1 %}<div>Special Note 02: {{ item.ITEM_notes.1 }}</div>{% endif %}
+            {% if item.ITEM_notes.2 %}<div>Special Note 03: {{ item.ITEM_notes.2 }}</div>{% endif %}
+            {% if item.ITEM_notes.3 %}<div>Special Note 04: {{ item.ITEM_notes.3 }}</div>{% endif %}
+            {% if item.ITEM_notes.4 %}<div>Special Note 05: {{ item.ITEM_notes.4 }}</div>{% endif %}
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <div>Dimension: {{ item.ITEM_dimension }}</div>
+        <div>Net Weight: {{ item.ITEM_net_weight }}</div>
+
+        {% if item.ITEM_type == "warranty" %}
+            <div>Brand Name: {{ item.ITEM_brand_name }}</div>
+            <div>Country of Origin: {{ item.ITEM_origin_country }}</div>
+            <div>Certificate: {{ item.ITEM_certificate }}</div>
+            <div>Serial: {{ item.ITEM_serial_number }}</div>
+        {% endif %}
+    </div>
+
+    {% if item.image and item.ITEM_type == "warranty" %}
+        <div class="section">
+            <img src="file://{{ image_path }}" />
+        </div>
+    {% endif %}
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load math_filters %}
+<meta charset="utf-8">
+<title>Quotation - {{ header.QUH_code }}</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+}
+.header {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+}
+.customer, .totals {
+    margin: 15px 0;
+}
+.table {
+    border-collapse: collapse;
+    width:100%;
+}
+.table th, .table td {
+    border: 1px solid #333;
+    padding:5px;
+}
+.item-image {
+    text-align: left;
+}
+.item-image img {
+    max-width: 100px;
+    max-height: 100px;
+}
+</style>
+</head>
+<body>
+<div class="header">KTC Quotation</div>
+
+<!-- Customer Info -->
+<div class="customer">
+    <strong>Code:</strong> {{ header.QUH_code }}<br/>
+    <strong>Date:</strong> {{ header.QUH_date|date:"Y-m-d" }}<br/>
+    <strong>Customer Name:</strong> {{ header.QUH_customer_name }}<br/>
+    <strong>Customer Address:</strong> {{ header.QUH_customer_address }}<br/>
+    <strong>Customer Contact:</strong> {{ header.QUH_customer_contact }}
+</div>
+
+<!-- Item Table -->
+<table class="table">
+<tr><th>Code</th><th>Description</th><th>QTY</th><th>Rate</th><th>Value</th></tr>
+{% for item in details %}
+<tr>
+    <td>{{ item.QUD_item.ITEM_code }}</td>
+    <td>{{ item.QUD_item.ITEM_description }}</td>
+    <td>{{ item.QUD_qty }}</td>
+    <td>{{ item.QUD_rate }}</td>
+    <td>{{ item.QUD_rate|multiply:item.QUD_qty }}</td>
+</tr>
+
+<tr>
+    <td colspan="5" class="item-image">
+        {% if item.QUD_item.image %}
+            <img src="{{ item.QUD_item.image.url }}" alt="{{ item.QUD_item.ITEM_description }}" />
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+<!-- Totals -->
+<div class="totals">
+    <strong>Gross Value:</strong> Rs.{{ header.QUH_gross_value }}<br/>
+    <strong>Net Value:</strong> Rs.{{ header.QUH_net_value }}
+</div>
+
+</body>
+</html>
