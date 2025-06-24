@@ -1,21 +1,29 @@
 import os
 from pathlib import Path
+import dj_database_url
 
+# BASE DIR
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# SECRET KEY
 SECRET_KEY = os.environ.get(
     "SECRET_KEY",
     "django-insecure-p8dn&&na8r2weuu#6e)@0%s*ykk*(-xtrya%l@4!&0e!v&qyg*"
 )
 
-# DEBUG will be False in production
+# DEBUG
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-# ALLOWED_HOSTS can be set via environment
-ALLOWED_HOSTS = ['ktc-fullstack-production.up.railway.app', '127.0.0.1', 'localhost']
+# ALLOWED HOSTS
+ALLOWED_HOSTS = [
+    'ktc-fullstack-production.up.railway.app',
+    '127.0.0.1',
+    'localhost',
+]
 
+# APPLICATIONS
 INSTALLED_APPS = [
-    # Django Apps
+    # Django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -23,19 +31,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # 3rd Party Apps
+    # 3rd party
     'rest_framework',
     'corsheaders',
 
-    # Your App
+    # Your app
     'inventory',
 ]
 
+# MIDDLEWARE
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-
-    # IMPORTANT for static files
     'whitenoise.middleware.WhiteNoiseMiddleware',
 
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -50,6 +57,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'backend.urls'
 
+# TEMPLATES
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -67,32 +75,34 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-# Database
-import dj_database_url
-
+# DATABASES
 DATABASES = {
     'default': dj_database_url.config(
-        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
+        default=os.environ.get('DATABASE_URL'),
         conn_max_age=600,
-        #ssl_require=True
+        conn_health_checks=True,
     )
 }
 
-# Password Validation
-# (Same as before)
+# PASSWORD VALIDATION
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'}, 
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'}, 
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'}, 
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'}, 
+]
 
-# Internationalization
+# INTERNATIONALIZATION
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static Files
+# STATIC FILES
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-#STATICFILES_DIRS = [BASE_DIR / 'static']
 
-# Media
+# MEDIA
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
