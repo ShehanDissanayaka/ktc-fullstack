@@ -12,7 +12,8 @@ SECRET_KEY = os.environ.get(
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 # ALLOWED_HOSTS can be set via environment
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",") if os.environ.get("ALLOWED_HOSTS") else []
+ALLOWED_HOSTS = ["ktc-fullstack-production.up.railway.app"]
+
 INSTALLED_APPS = [
     # Django Apps
     'django.contrib.admin',
