@@ -12,7 +12,7 @@ SECRET_KEY = os.environ.get(
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 # ALLOWED_HOSTS can be set via environment
-ALLOWED_HOSTS = ["ktc-fullstack-production.up.railway.app"]
+ALLOWED_HOSTS = ['ktc-fullstack-production.up.railway.app', '127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
     # Django Apps
