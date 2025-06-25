@@ -2,13 +2,14 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://127.0.0.1:8000", // Base API URL
+  baseURL:
+    process.env.REACT_APP_API_URL || "https://ktc-fullstack-production.up.railway.app/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Request Interceptor (Optional: For logging or adding tokens)
+// Request Interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
     console.log("🚀 Axios Request:", config);
@@ -17,7 +18,7 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor (Optional: For global error handling)
+// Response Interceptor
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
