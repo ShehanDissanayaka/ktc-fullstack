@@ -224,10 +224,9 @@ const ItemMaster = () => {
             data.append("ITEM_dimension", form.dimension);
             data.append("ITEM_net_weight", form.netWeight);
 
-            // ✅ Append ITEM_notes one by one
-            form.notes.forEach(note => {
-                data.append("ITEM_notes", note || "");
-            });
+            // ✅ Append ITEM_notes as a JSON array
+            data.append("ITEM_notes", JSON.stringify(form.notes));
+
 
             // File upload
             if (imageFile) {
