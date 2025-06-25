@@ -1,0 +1,213 @@
+/* Base container */
+.type-master-container {
+  width: 800px;
+  margin: 40px auto;
+  font-family: Arial, sans-serif;
+  border: 2px solid #1e88e5;
+  border-radius: 8px;
+  background-color: #f0f8ff;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(30, 136, 229, 0.1);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Title */
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1565c0;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Sections */
+.type-master-section {
+  background-color: #ffffff;
+  border: 1px solid #90caf9;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+  text-align: left;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.type-master-section h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #1976d2;
+  font-size: 18px;
+}
+
+/* Form rows */
+.form-row,
+.form-row-search {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.form-row label {
+  width: 150px;
+  margin-right: 8px;
+  font-weight: 500;
+}
+
+.form-row-search label {
+  width: 100px;
+  margin-right: 8px;
+  font-weight: 500;
+}
+
+/* Inputs and selects */
+.form-row input,
+.form-row-search input,
+.form-row-search select,
+.form-row textarea {
+  flex: 1;
+  padding: 6px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #000;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.form-row input {
+  max-width: 25%;
+}
+
+.form-row-search input {
+  max-width: 100%;
+}
+
+.form-row-search select {
+  max-width: 20%;
+  margin-right: 8px;
+}
+
+.form-row textarea {
+  font-family: inherit;
+}
+
+/* Buttons */
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+button {
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  background-color: #1976d2;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #1565c0;
+}
+
+button:disabled {
+  background-color: #90caf9;
+}
+
+/* Table */
+.table-container {
+  border: 1px solid #ccc;
+  background: #fff;
+  overflow-x: auto;
+  border-radius: 6px;
+  margin-top: 16px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background-color: #e3f2fd;
+}
+
+th,
+td {
+  padding: 8px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+/* Footer */
+.footer-hint {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+}
+
+/* 🌙 Dark Mode Support */
+.dark .type-master-container {
+  background-color: #1e1e2f;
+  border-color: #3949ab;
+  color: #f5f5f5;
+}
+
+.dark .title {
+  color: #90caf9;
+}
+
+.dark .type-master-section {
+  background-color: #2c2c3e;
+  border-color: #5c6bc0;
+}
+
+.dark .type-master-section h3 {
+  color: #64b5f6;
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #42425a;
+  color: #ffffff;
+  border: 1px solid #666;
+}
+
+.dark .table-container {
+  background-color: #2c2c3e;
+  color: #f5f5f5;
+  border-color: #444;
+}
+
+.dark thead {
+  background-color: #37474f;
+}
+
+.dark th,
+.dark td {
+  color: #f5f5f5;
+  border-color: #555;
+}
+
+.dark .footer-hint {
+  color: #aaaaaa;
+}
+
+.dark button {
+  background-color: #3949ab;
+  color: #ffffff;
+}
+
+.dark button:hover {
+  background-color: #303f9f;
+}
+
+.dark button:disabled {
+  background-color: #5c6bc0;
+}
