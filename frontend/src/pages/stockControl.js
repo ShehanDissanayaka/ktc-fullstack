@@ -61,19 +61,7 @@ const StockControl = () => {
       <div className="main-container">
         {/* Side Menu */}
         <div className="side-menu">
-          <div className="menu-section">
-            <ul>
-              {['Accounts Receivable', 'Accounts Payable', 'Post Dated CHQ'].map((item) => (
-                <li
-                  key={item}
-                  className={activeMenu === item ? 'active' : ''}
-                  onClick={() => setActiveMenu(item)}
-                >
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
+          
           <div className="menu-section">
             <h3>Master Files</h3>
             <ul>
