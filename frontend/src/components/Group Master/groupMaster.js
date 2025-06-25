@@ -36,7 +36,7 @@ const GroupMaster = () => {
     }
 
     try {
-      const response = await axios.post("/api/groupMasters/", {
+      const response = await axios.post("/groupMasters/", {
         GROUP_code: groupCode,
         GROUP_description: groupDescription,
       });
