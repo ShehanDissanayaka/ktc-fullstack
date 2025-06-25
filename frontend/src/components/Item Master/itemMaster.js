@@ -562,7 +562,7 @@ const ItemMaster = () => {
                 <button onClick={resetForm}>New</button>
                 <button onClick={removeItem}>Remove</button>
                 <button onClick={async () => {
-                    const res = await axios.get(`/api/price-list/pdf/`, { responseType: 'blob' });
+                    const res = await axios.get(`/price-list/pdf/`, { responseType: 'blob' });
                     const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
                     window.open(url, "_blank");
                 }}>
