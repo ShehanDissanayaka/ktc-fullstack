@@ -19,7 +19,7 @@ const GroupMaster = () => {
   //Fetch Groups from API
   const fetchGroups = useCallback(async () => {
   try {
-    const response = await axios.get("/api/groupMasters/");
+    const response = await axios.get("/groupMasters/");
     setGroups(response.data);
   } catch (error) {
     console.error("Error fetching group data:", error);
