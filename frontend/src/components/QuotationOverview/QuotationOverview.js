@@ -27,7 +27,7 @@ const QuotationOverview = () => {
     useEffect(() => {
         const fetchItems = async () => {
             try {
-                const res = await axios.get("/api/item/");
+                const res = await axios.get("/item/");
                 console.log("Available Items:", res.data);
                 setAvailableItems(res.data);
             } catch (error) {
@@ -74,7 +74,7 @@ const QuotationOverview = () => {
             })),
         };
         try {
-            const res = await axios.post("/api/quotation/", payload);
+            const res = await axios.post("/quotation/", payload);
             console.log("Save Response:", res.data);
             alert("✅ Quotation Saved");
             setQuotationId(res.data.id);
@@ -90,7 +90,7 @@ const QuotationOverview = () => {
     const deleteQuotation = async () => {
         if (!quotationId) return alert("Save first!");
         try {
-            await axios.delete(`/api/quotation/${quotationId}/`);
+            await axios.delete(`/quotation/${quotationId}/`);
             alert("✅ Deleted");
         } catch (error) {
             console.error(error);
@@ -100,7 +100,7 @@ const QuotationOverview = () => {
     const printQuotation = async () => {
         if (!quotationId) return alert("Save first!");
         try {
-            const res = await axios.get(`/api/quotation/${quotationId}/pdf/`, {
+            const res = await axios.get(`/quotation/${quotationId}/pdf/`, {
                 responseType: "blob",
             });
             const url = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));

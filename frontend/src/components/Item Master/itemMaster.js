@@ -128,7 +128,7 @@ const ItemMaster = () => {
     useEffect(() => {
         const fetchGroups = async () => {
             try {
-                const response = await axios.get("/api/groupMasters/");
+                const response = await axios.get("/groupMasters/");
                 setGroupOptions(response.data); // response should be an array of { GROUP_code, GROUP_description }
             } catch (error) {
                 console.error("Error fetching group codes:", error);
@@ -146,7 +146,7 @@ const ItemMaster = () => {
     useEffect(() => {
         const fetchTypes = async () => {
             try {
-                const res = await axios.get("/api/typeMasters/");
+                const res = await axios.get("/typeMasters/");
                 setTypeOptions(res.data);              // [{ TYPE_code, TYPE_description, … }]
             } catch (err) {
                 console.error("Error loading types:", err);
@@ -164,7 +164,7 @@ const ItemMaster = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await axios.get("/api/categoryMasters/");
+                const res = await axios.get("/categoryMasters/");
                 setCategoryOptions(res.data); // [{ CATEGORY_code, CATEGORY_description, ... }]
             } catch (err) {
                 console.error("Error loading categories:", err);
