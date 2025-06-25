@@ -37,8 +37,20 @@
 =========================================================== */
 .top-sections {
   display: flex;
+  align-items: flex-start; /* Align sections at the top instead of stretching */
   justify-content: space-between;
   gap: 20px;
+}
+
+/* Let header-section take full height */
+.header-section {
+  flex: 1;
+}
+
+/* Make these sections shrink to fit content */
+.item-section,
+.totals-section {
+  flex: 0 1 auto; /* Don't force full height */
 }
 
 .section {

@@ -18,7 +18,7 @@ const StockControl = () => {
         case 'Type Master': return <TypeMaster />;
         case 'Category Master': return <CategoryMaster />;
         case 'Item Master': return <ItemMaster />;
-        case 'QuotationOverview': return <QuotationOverview />;
+        case 'Quotation': return <QuotationOverview />;
         default: return <div className="placeholder-message">Select a menu item to continue.</div>;
       }
     })();
@@ -78,10 +78,7 @@ const StockControl = () => {
             <h3>Master Files</h3>
             <ul>
               {[
-                'Group Master', 'Type Master', 'Category Master', 'Location Master',
-                'Item Master', 'Rep Master', 'GRN', 'Supplier Master', 'Customer Master',
-                'Good Recieved Note', 'Customer Group', 'Title Master', 'Area Master',
-                'Credit Card Bank', 'QuotationOverview'
+                'Group Master', 'Type Master', 'Category Master', 'Item Master', 'Customer Master', 'Quotation'
               ].map((item) => (
                 <li
                   key={item}
