@@ -14,7 +14,7 @@ const CategoryMaster = () => {
   // 🚀 Fetch categories from the backend
   const fetchCategories = useCallback(async () => {
   try {
-    const response = await axios.get("/api/categoryMasters/");
+    const response = await axios.get("/categoryMasters/");
     setCategories(response.data);
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -30,7 +30,7 @@ const CategoryMaster = () => {
     }
 
     try {
-      await axios.post("/api/categoryMasters/", {
+      await axios.post("/categoryMasters/", {
         CATEGORY_code: categoryCode.trim(),
         CATEGORY_description: categoryDescription.trim(),
         CATEGORY_active: true, // Always active when created

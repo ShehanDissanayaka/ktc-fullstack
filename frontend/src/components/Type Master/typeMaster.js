@@ -19,7 +19,7 @@ const TypeMaster = () => {
   // 🔧 Fetch Types from API
   const fetchTypes = useCallback(async () => {
   try {
-    const response = await axios.get("/api/typeMasters/");
+    const response = await axios.get("/typeMasters/");
     setTypes(response.data);
   } catch (error) {
     console.error("Error fetching type data:", error);
@@ -36,7 +36,7 @@ const TypeMaster = () => {
     }
 
     try {
-      const response = await axios.post("/api/typeMasters/", {
+      const response = await axios.post("/typeMasters/", {
         TYPE_code: typeCode, 
         TYPE_description: typeDescription,
       });
