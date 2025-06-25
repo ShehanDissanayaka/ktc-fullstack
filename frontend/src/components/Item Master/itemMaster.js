@@ -44,7 +44,7 @@ const blank = {
 };
 
 
-const API = "/api/item/";
+const API = "/item/";
 
 const toBackend = (f) => ({
     ITEM_code: f.code,
