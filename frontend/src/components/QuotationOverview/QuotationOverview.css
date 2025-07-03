@@ -89,19 +89,29 @@
 .item-section {
   display: flex;
   flex-direction: column;
+  max-width: 400px;          /* 🔧 Adjust this width as needed */
+  width: 100%;
+  margin: 0 auto;            /* 🔧 Center horizontally */
+  padding: 0 10px;           /* ✅ Optional padding for small screens */
 }
+
 .add-button-container {
   display: flex;
   justify-content: flex-start;
   margin: 5px 0;
+  width: 100%;               /* Ensure it follows the .item-section width */
 }
+
 .add-button {
   padding: 8px 16px;
   font-size: 14px;
   background-color: var(--primary-color);
   color: #fff;
   border-radius: 4px;
+  border: none;
+  cursor: pointer;
 }
+
 .add-button:hover {
   background-color: var(--secondary-color);
 }

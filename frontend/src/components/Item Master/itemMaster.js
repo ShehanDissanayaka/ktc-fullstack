@@ -310,6 +310,24 @@ const ItemMaster = () => {
         [items, searchCode, searchDesc]
     );
 
+    const handleDownloadPDF = async () => {
+        try {
+            const res = await axios.get("/price-list/pdf/", {
+                responseType: "blob",
+            });
+            const url = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "PriceList.pdf");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (err) {
+            console.error("Failed to download price list PDF:", err);
+            alert("Failed to download PDF");
+        }
+    };
+
     return (
         <div className="item-master-container">
             <div className="title">Item Master</div>
@@ -561,13 +579,10 @@ const ItemMaster = () => {
                 <button onClick={saveItem}>Save</button>
                 <button onClick={resetForm}>New</button>
                 <button onClick={removeItem}>Remove</button>
-                <button onClick={async () => {
-                    const res = await axios.get(`/api/price-list/pdf/`, { responseType: 'blob' });
-                    const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
-                    window.open(url, "_blank");
-                }}>
+                <button className="btn-download" onClick={handleDownloadPDF}>
                     Download Price List PDF
                 </button>
+
 
             </div>
 
