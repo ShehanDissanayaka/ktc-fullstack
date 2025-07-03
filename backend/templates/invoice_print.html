@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice - {{ invoice.INVOICE_H_number }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 13px;
+            margin: 30px;
+            color: #333;
+        }
+
+        .company-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .company-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .company-header p {
+            font-size: 12px;
+            margin: 5px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 8px;
+            font-size: 13px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+
+        .no-border {
+            border: none !important;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .signature {
+            margin-top: 40px;
+        }
+
+        .signature p {
+            margin: 30px 0 10px 0;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="company-header">
+        <h2>KITCHEN GALLERY ENTERPRISES (PVT) LTD</h2>
+        <p>No 122, Old Matara Road, Galle</p>
+        <p>Tel: 091-XXXXXXX | Email: sales@ktc.lk</p>
+        <h3>INVOICE</h3>
+    </div>
+
+    <table>
+        <tr>
+            <td class="bold">Customer:</td>
+            <td>{{ invoice.INVOICE_H_customer.CUSTOMER_name }}<br>{{ invoice.INVOICE_H_customer.CUSTOMER_address }}</td>
+            <td class="bold">Invoice No:</td>
+            <td>{{ invoice.INVOICE_H_number }}</td>
+        </tr>
+        <tr>
+            <td class="bold">Contact No:</td>
+            <td>{{ invoice.INVOICE_H_customer.CUSTOMER_tele_mobile }}</td>
+            <td class="bold">Date:</td>
+            <td>{{ invoice.INVOICE_H_datetime|date:"d M Y" }}</td>
+        </tr>
+        <tr>
+            <td class="bold">Payment Type:</td>
+            <td>{{ invoice.INVOICE_H_payment_term }}</td>
+            <td class="bold">Sales Rep:</td>
+            <td>{{ invoice.INVOICE_H_sales_rep }}</td>
+        </tr>
+    </table>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Item Code</th>
+                <th>Description</th>
+                <th class="text-right">Rate (Rs)</th>
+                <th class="text-right">Qty</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in details %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    {% if item.INVOICE_D_item %}
+                    {{ item.INVOICE_D_item.ITEM_code }}
+                    {% else %}
+                    (no item)
+                    {% endif %}
+                </td>
+                <td>
+                    {% if item.INVOICE_D_item %}
+                    {{ item.INVOICE_D_item.ITEM_description }}
+                    {% else %}
+                    (no description)
+                    {% endif %}
+                </td>
+
+                <td class="text-right">{{ item.INVOICE_D_rate|floatformat:2 }}</td>
+                <td class="text-right">{{ item.INVOICE_D_qty|floatformat:2 }}</td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table>
+        <tr>
+            <td colspan="5" class="no-border text-right">Subtotal:</td>
+            <td class="text-right">{{ subtotal|floatformat:2 }}</td>
+            </td>
+        </tr>
+        
+        <tr>
+            <td colspan="5" class="no-border text-right">Total Discount:</td>
+            <td class="text-right">{{ invoice.INVOICE_H_total_discount|floatformat:2 }}</td>
+        </tr>
+        <tr>
+            <td colspan="5" class="no-border text-right bold">Grand Total:</td>
+            <td class="text-right bold">{{ invoice.INVOICE_H_grand_total|floatformat:2 }}</td>
+        </tr>
+    </table>
+
+    <div class="signature">
+        <p>Authorized Signature: __________________________</p>
+        <p>Customer Signature: ____________________________</p>
+    </div>
+
+</body>
+
+</html>

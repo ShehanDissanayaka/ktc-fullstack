@@ -18,11 +18,7 @@ class CategoryMasterSerializer(serializers.ModelSerializer):
 
 
 class ItemMasterSerializer(serializers.ModelSerializer):
-    ITEM_notes = serializers.ListField(
-        child=serializers.CharField(),
-        allow_null=True,
-        required=False
-    )
+    ITEM_notes = serializers.CharField(allow_null=True, required=False)
 
     class Meta:
         model = ItemMaster
@@ -81,4 +77,38 @@ class QuotationHeaderSerializer(serializers.ModelSerializer):
         header = QuotationHeader.objects.create(**validated_data)
         for item_data in details_data:
             QuotationDetail.objects.create(QUD_quotation=header, **item_data)
+        return header
+
+
+from rest_framework import serializers
+from .models import Customer
+
+class CustomerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = '__all__'
+
+
+from rest_framework import serializers
+from .models import InvoiceHeader, InvoiceDetail
+
+class InvoiceDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvoiceDetail
+        exclude = []
+        read_only_fields = ['INVOICE_D_h']
+
+
+class InvoiceHeaderSerializer(serializers.ModelSerializer):
+    details = InvoiceDetailSerializer(many=True)
+
+    class Meta:
+        model = InvoiceHeader
+        fields = '__all__'
+
+    def create(self, validated_data):
+        details_data = validated_data.pop('details')
+        header = InvoiceHeader.objects.create(**validated_data)
+        for detail in details_data:
+            InvoiceDetail.objects.create(INVOICE_D_h=header, **detail)
         return header

@@ -168,3 +168,77 @@ class QuotationHeaderViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework import viewsets
+from .models import Customer
+from .serializers import CustomerSerializer
+
+class CustomerViewSet(viewsets.ModelViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            print("❌ Validation Errors:", serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+from rest_framework import viewsets
+from .models import InvoiceHeader
+from .serializers import InvoiceHeaderSerializer
+
+class InvoiceViewSet(viewsets.ModelViewSet):
+    queryset = InvoiceHeader.objects.all()
+    serializer_class = InvoiceHeaderSerializer
+
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+import weasyprint
+
+def generate_invoice_pdf(request, pk):
+    invoice = InvoiceHeader.objects.get(pk=pk)
+    html = render_to_string('invoice_pdf_template.html', {'invoice': invoice})
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'filename=invoice_{pk}.pdf'
+    weasyprint.HTML(string=html).write_pdf(response)
+    return response
+
+
+from django.shortcuts import render, get_object_or_404
+from .models import InvoiceHeader, InvoiceDetail
+from django.http import HttpResponse
+from weasyprint import HTML
+
+def print_invoice_by_number(request, number):
+    invoice = get_object_or_404(InvoiceHeader, INVOICE_H_number=number)
+    details = InvoiceDetail.objects.filter(INVOICE_D_h=invoice).select_related('INVOICE_D_item')
+
+    subtotal = sum(d.INVOICE_D_qty * d.INVOICE_D_rate for d in details)
+
+    html_string = render(
+        request,
+        'invoice_print.html',
+        {
+            'invoice': invoice,
+            'details': details,
+            'subtotal': subtotal
+        }
+    ).content.decode('utf-8')
+
+    if request.GET.get("pdf"):
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename=invoice_{number}.pdf'
+        HTML(string=html_string).write_pdf(response)
+        return response
+    else:
+        return render(request, 'invoice_print.html', {
+            'invoice': invoice,
+            'details': details,
+            'subtotal': subtotal
+        })
+
+

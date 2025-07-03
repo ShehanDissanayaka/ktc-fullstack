@@ -129,3 +129,78 @@ class QuotationDetail(models.Model):
 
     def total(self):
         return self.QUD_rate * self.QUD_qty
+
+
+class Customer(models.Model):
+    CUSTOMER_code = models.CharField(max_length=15, unique=True)
+    CUSTOMER_group = models.IntegerField()
+    CUSTOMER_area = models.IntegerField()
+    CUSTOMER_name = models.CharField(max_length=150)
+    CUSTOMER_title = models.CharField(max_length=20, null=True, blank=True)
+    CUSTOMER_title_id = models.IntegerField(null=True, blank=True)
+    CUSTOMER_address = models.CharField(max_length=400, null=True, blank=True)
+    CUSTOMER_tele_1 = models.CharField(max_length=50, null=True, blank=True)
+    CUSTOMER_tele_2 = models.CharField(max_length=50, null=True, blank=True)
+    CUSTOMER_tele_mobile = models.CharField(max_length=50, null=True, blank=True)
+    CUSTOMER_fax = models.CharField(max_length=50, null=True, blank=True)
+    CUSTOMER_email = models.EmailField(max_length=100, null=True, blank=True)
+    CUSTOMER_contact_person = models.CharField(max_length=150, null=True, blank=True)
+    CUSTOMER_contact_person_title = models.CharField(max_length=20, null=True, blank=True)
+    CUSTOMER_contact_person_title_id = models.IntegerField(null=True, blank=True)
+    CUSTOMER_term = models.IntegerField()
+    CUSTOMER_vat_number = models.CharField(max_length=20, null=True, blank=True)
+    CUSTOMER_credit_limit = models.DecimalField(max_digits=22, decimal_places=2, null=True, blank=True)
+    CUSTOMER_creidt_period = models.BigIntegerField(null=True, blank=True)
+    CUSTOMER_account_number = models.IntegerField()
+    CUSTOMER_lock = models.BooleanField(default=False)
+    CUSTOMER_created_user_session = models.BigIntegerField(null=True, blank=True)
+    CUSTOMER_created_datetime = models.DateTimeField(null=True, blank=True)
+    CUSTOMER_last_edited_user_session = models.BigIntegerField(null=True, blank=True)
+    CUSTOMER_last_edited_datetime = models.DateTimeField(null=True, blank=True)
+    CUSTOMER_prefix_id = models.BigIntegerField()
+    CUSTOMER_prefix_number = models.IntegerField()
+
+    def __str__(self):
+        return self.CUSTOMER_name
+
+
+class InvoiceHeader(models.Model):
+    INVOICE_H_id = models.BigAutoField(primary_key=True)
+    INVOICE_H_location = models.CharField(max_length=100)
+    INVOICE_H_number = models.CharField(max_length=20)
+    INVOICE_H_code = models.CharField(max_length=20)
+    INVOICE_H_token = models.CharField(max_length=50, blank=True, null=True)
+    INVOICE_H_sales_rep = models.CharField(max_length=100, blank=True, null=True)
+    INVOICE_H_datetime = models.DateTimeField(auto_now_add=True)
+    INVOICE_H_customer = models.ForeignKey('Customer', on_delete=models.PROTECT)
+    INVOICE_H_payment_term = models.CharField(max_length=20)
+    INVOICE_H_total_discount_value = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    INVOICE_H_total_discount_type = models.CharField(max_length=10, choices=[("Value", "Value"), ("Percentage", "Percentage")])
+    INVOICE_H_total_discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    INVOICE_H_processed = models.BooleanField(default=False)
+    INVOICE_H_grand_total = models.DecimalField(max_digits=12, decimal_places=2)
+    INVOICE_H_commision = models.DecimalField(max_digits=10, decimal_places=2)
+    INVOICE_H_user = models.CharField(max_length=100)
+    INVOICE_H_type = models.CharField(max_length=20, default='Cash')  # or 'Credit', etc.
+    INVOICE_H_remakrs = models.TextField(blank=True, null=True)
+
+    class Meta:
+        db_table = "INV_Invoice_H"
+
+class InvoiceDetail(models.Model):
+    INVOICE_D_id = models.BigAutoField(primary_key=True)
+    INVOICE_D_h = models.ForeignKey(InvoiceHeader, related_name="details", on_delete=models.CASCADE)
+    INVOICE_D_item = models.ForeignKey('ItemMaster', on_delete=models.PROTECT)
+    INVOICE_D_qty = models.DecimalField(max_digits=10, decimal_places=2)
+    INVOICE_D_rate = models.DecimalField(max_digits=10, decimal_places=2)
+    INVOICE_D_discount_value = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    INVOICE_D_discount_type = models.CharField(max_length=10, choices=[("Value", "Value"), ("Percentage", "Percentage")])
+    INVOICE_D_discount_total = models.DecimalField(max_digits=10, decimal_places=2)
+    INVOICE_D_warranty_month = models.IntegerField(default=0)
+    INVOICE_D_vat = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    INVOICE_D_vat_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    INVOICE_D_sales_rep = models.CharField(max_length=100, blank=True, null=True)
+    INVOICE_D_qty_balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    class Meta:
+        db_table = "INV_Invoice_D"
