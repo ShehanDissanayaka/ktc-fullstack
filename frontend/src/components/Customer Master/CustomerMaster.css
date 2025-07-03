@@ -1,0 +1,227 @@
+.customer-master {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 24px;
+  font-family: Arial, sans-serif;
+  background-color: var(--card-bg, #f9f9f9);
+  color: var(--text-color, #000);
+  border: 2px solid var(--primary-color, #1565c0);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease;
+}
+
+.customer-master:hover {
+  border-color: var(--secondary-color, #0d47a1);
+}
+
+.customer-master h2 {
+  font-size: 24px;
+  text-align: center;
+  margin-bottom: 25px;
+  color: var(--primary-color, #1565c0);
+  font-weight: bold;
+}
+
+.form-grid {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.form-col {
+  flex: 1;
+  min-width: 300px;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.form-row label {
+  width: 140px;
+  min-width: 120px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--secondary-color, #1976d2);
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+  flex: 1;
+  padding: 7px 10px;
+  font-size: 14px;
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 6px;
+  background-color: var(--input-bg, #fff);
+  color: var(--text-color, #000);
+  transition: border-color 0.3s ease;
+}
+
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus {
+  border-color: var(--highlight-color, #1565c0);
+  outline: none;
+}
+
+textarea {
+  resize: vertical;
+  height: 60px;
+  font-family: inherit;
+}
+
+.form-row.checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.form-row.checkbox label {
+  width: auto;
+  margin-right: 10px;
+}
+
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.button-row button {
+  padding: 8px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: var(--primary-color, #1976d2);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.button-row button:hover {
+  background-color: var(--secondary-color, #0d47a1);
+}
+
+.search-section {
+  margin-top: 35px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-section input,
+.search-section select {
+  padding: 7px 10px;
+  font-size: 14px;
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 6px;
+  background-color: var(--input-bg, #fff);
+  color: var(--text-color, #000);
+  transition: border-color 0.3s ease;
+}
+
+.search-section input:focus,
+.search-section select:focus {
+  border-color: var(--highlight-color, #1565c0);
+  outline: none;
+}
+
+.table-section {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.table-section table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-section th,
+.table-section td {
+  border: 1px solid var(--border-color, #ccc);
+  padding: 8px;
+  font-size: 14px;
+  text-align: left;
+  word-break: break-word;
+}
+
+.table-section th {
+  background-color: var(--table-header-bg, #e3f2fd);
+  color: var(--primary-color, #1565c0);
+  font-weight: 600;
+}
+
+.footer-hints {
+  margin-top: 25px;
+  font-size: 13px;
+  color: var(--hint-color, #555);
+  text-align: center;
+}
+
+/* Placeholder message */
+.placeholder-message {
+  font-size: 14px;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* =====================
+   DARK MODE OVERRIDES
+===================== */
+.dark {
+  --primary-color: #90caf9;
+  --secondary-color: #64b5f6;
+  --highlight-color: #42a5f5;
+  --input-bg: #1e1e2f;
+  --card-bg: #121212;
+  --text-color: #e0e0e0;
+  --border-color: #444;
+  --table-header-bg: #1a237e;
+  --hint-color: #aaa;
+}
+
+.dark .customer-master {
+  background-color: var(--card-bg);
+  border-color: var(--primary-color);
+  color: var(--text-color);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.dark .form-row input,
+.dark .form-row select,
+.dark .form-row textarea,
+.dark .search-section input,
+.dark .search-section select {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.dark .form-row input:focus,
+.dark .form-row select:focus,
+.dark .form-row textarea:focus,
+.dark .search-section input:focus,
+.dark .search-section select:focus {
+  border-color: var(--highlight-color);
+}
+
+.dark .table-section th,
+.dark .table-section td {
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.dark .table-section th {
+  background-color: var(--table-header-bg);
+  color: var(--highlight-color);
+}

@@ -22,6 +22,8 @@ const QuotationOverview = () => {
     const [grossValue, setGrossValue] = useState(0);
     const [netValue, setNetValue] = useState(0);
     const [quotationId, setQuotationId] = useState(null);
+    const [customers, setCustomers] = useState([]);
+
 
     // Load Items
     useEffect(() => {
@@ -38,6 +40,19 @@ const QuotationOverview = () => {
         fetchItems();
     }, []);
 
+    useEffect(() => {
+        const fetchCustomers = async () => {
+            try {
+                const res = await axios.get('/customers/');
+                setCustomers(res.data);
+            } catch (err) {
+                console.error(err);
+                alert("❌ Failed to load customers.");
+            }
+        };
+
+        fetchCustomers();
+    }, []);
 
     const handleHeaderChange = e => {
         const { name, value } = e.target;
@@ -129,6 +144,14 @@ const QuotationOverview = () => {
         setNetValue(0);
         setQuotationId(null);
     };
+    // date format 
+    const displayDate = (isoDate) => {
+        if (!isoDate) return "";
+        const [y, m, d] = isoDate.split("-");
+        return `${d}/${m}/${y}`;
+    };
+
+
     return (
         <div className="quotation-container">
             <div className="top-sections">
@@ -189,9 +212,43 @@ const QuotationOverview = () => {
 
                 {/* Right Section */}
                 <div className="section totals-section">
-                    <div className="input-group"><label>Customer Name</label><input name="QUH_customer_name" value={header.QUH_customer_name} onChange={handleHeaderChange} /></div>
-                    <div className="input-group"><label>Customer Address</label><input name="QUH_customer_address" value={header.QUH_customer_address} onChange={handleHeaderChange} /></div>
-                    <div className="input-group"><label>Customer Contact</label><input name="QUH_customer_contact" value={header.QUH_customer_contact} onChange={handleHeaderChange} /></div>
+                    <div className="input-group">
+                        <label>Customer</label>
+                        <select
+                            name="QUH_customer_name"
+                            onChange={(e) => {
+                                const selectedId = parseInt(e.target.value);
+                                const selectedCustomer = customers.find(c => c.id === selectedId);
+                                if (selectedCustomer) {
+                                    setHeader({
+                                        ...header,
+                                        QUH_customer_name: selectedCustomer.CUSTOMER_name, // ✅ Send name
+                                        QUH_customer_address: selectedCustomer.CUSTOMER_address,
+                                        QUH_customer_contact: selectedCustomer.CUSTOMER_tele_1,
+                                    });
+                                }
+                            }}
+                        >
+                            <option value="">-- Select Customer --</option>
+                            {customers.map(c => (
+                                <option key={c.id} value={c.id}>
+                                    {c.CUSTOMER_code} - {c.CUSTOMER_name}
+                                </option>
+                            ))}
+                        </select>
+
+                    </div>
+
+                    <div className="input-group">
+                        <label>Customer Address</label>
+                        <input name="QUH_customer_address" value={header.QUH_customer_address} readOnly />
+                    </div>
+
+                    <div className="input-group">
+                        <label>Customer Contact</label>
+                        <input name="QUH_customer_contact" value={header.QUH_customer_contact} readOnly />
+                    </div>
+
                     <div className="totals">
                         <div>Gross Value: Rs. {grossValue.toFixed(2)}</div>
                         <div>Net Value: Rs. {netValue.toFixed(2)}</div>

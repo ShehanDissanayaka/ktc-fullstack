@@ -7,6 +7,8 @@ import TypeMaster from '../components/Type Master/typeMaster';
 import CategoryMaster from '../components/Category Master/categoryMaster';
 import ItemMaster from '../components/Item Master/itemMaster';
 import QuotationOverview from '../components/QuotationOverview/QuotationOverview';
+import CustomerMaster from '../components/Customer Master/CustomerMaster';
+import InvoiceCashier from '../components/Invoice/InvoiceCashier';
 const StockControl = () => {
   const [activeMenu, setActiveMenu] = useState(null);
   const [darkMode, setDarkMode] = useState(true);
@@ -19,6 +21,8 @@ const StockControl = () => {
         case 'Category Master': return <CategoryMaster />;
         case 'Item Master': return <ItemMaster />;
         case 'Quotation': return <QuotationOverview />;
+        case 'Customer Master': return <CustomerMaster/>;
+        case 'Invoice' : return <InvoiceCashier/>;
         default: return <div className="placeholder-message">Select a menu item to continue.</div>;
       }
     })();
@@ -66,7 +70,7 @@ const StockControl = () => {
             <h3>Master Files</h3>
             <ul>
               {[
-                'Group Master', 'Type Master', 'Category Master', 'Item Master', 'Customer Master', 'Quotation'
+                'Group Master', 'Type Master', 'Category Master', 'Item Master', 'Customer Master', 'Quotation', 'Invoice'
               ].map((item) => (
                 <li
                   key={item}

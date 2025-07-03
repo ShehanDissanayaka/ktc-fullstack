@@ -1,0 +1,371 @@
+/* InvoiceCashier.css - Updated with Full Dark/Light Mode Support */
+
+:root {
+  --font-family: Arial, sans-serif;
+  --font-size: 12px;
+  --label-font-size: 13px;
+  --input-height: 25px;
+  --btn-icon-width: 100px;
+  --bg-light: #ffffff;
+  --bg-dark: #050313;
+  --panel-light: #f0f0f0;
+  --panel-dark: #1e1e2f;
+  --form-light: #ffffff;
+  --form-dark: #0f021f;
+  --text-light: #000000;
+  --text-dark: #e0e0e0;
+  --border-light: #999;
+  --border-dark: #555;
+  --highlight: #0066cc;
+  --table-header-light: #e0e0e0;
+  --table-header-dark: #210427;
+  --table-bg-dark: #1a011b;
+}
+
+/* Dark mode overrides */
+.dark {
+  --bg-light: var(--bg-dark);
+  --panel-light: var(--panel-dark);
+  --form-light: var(--form-dark);
+  --text-light: var(--text-dark);
+  --border-light: var(--border-dark);
+  --table-header-light: var(--table-header-dark);
+  --table-bg-light: var(--table-bg-dark);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.invoice-container {
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  background-color: var(--bg-light);
+  padding: 10px;
+  min-height: 100vh;
+  color: var(--text-light);
+}
+
+.invoice-header {
+  background-color: var(--panel-light);
+  border: 1px solid var(--border-light);
+  padding: 5px 10px;
+  margin-bottom: 10px;
+}
+
+.invoice-header h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.invoice-content {
+  background-color: var(--panel-light);
+  border: 1px solid var(--border-light);
+  padding: 15px;
+}
+
+.invoice-details h3 {
+  margin: 0 0 10px 0;
+  font-size: 13px;
+  font-weight: normal;
+  color: var(--text-light);
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 10px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+  flex: 1;
+}
+
+.form-group label {
+  font-size: var(--label-font-size);
+  color: var(--text-light);
+  margin-bottom: 2px;
+}
+
+.form-group input,
+.form-group select {
+  border: 1px solid var(--border-light);
+  padding: 3px 5px;
+  font-size: 11px;
+  background-color: var(--form-light);
+  color: var(--text-light);
+  height: var(--input-height);
+  width: 150px;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--highlight);
+  width: 120px;
+}
+
+.customer-group {
+  flex: 2;
+}
+
+.customer-input {
+  display: flex;
+  gap: 5px;
+  width: 400px;
+}
+
+.customer-input select {
+  flex: 1;
+}
+
+.btn-icon,
+.btn-add,
+.btn-print,
+.btn-save,
+.btn-close {
+  background-color: var(--panel-light);
+  border: 1px solid var(--border-light);
+  color: var(--text-light);
+  font-size: 11px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  height: var(--input-height);
+  width: var(--btn-icon-width);
+}
+
+.btn-icon:hover,
+.btn-add:hover,
+.btn-save:hover,
+.btn-close:hover {
+  background-color: #b0b0b0;
+}
+
+.item-entry {
+  margin-top: 20px;
+  border-top: 1px solid var(--border-light);
+  padding-top: 15px;
+}
+
+.input-with-button {
+  display: flex;
+  gap: 5px;
+}
+
+.input-with-button select {
+  flex: 1;
+}
+
+.price-input {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-light);
+  background-color: var(--form-light);
+  border-radius: 4px;
+  height: var(--input-height);
+  width: 250px;
+  overflow: hidden;
+}
+
+.price-input span {
+  background-color: var(--panel-light);
+  padding: 3px 6px;
+  font-size: 12px;
+  border-right: 1px solid var(--border-light);
+  color: var(--text-light);
+}
+
+.price-input input {
+  flex: 1;
+  border: none;
+  padding: 3px 6px;
+  font-size: 12px;
+  text-align: right;
+  background-color: var(--form-light);
+  /* 🔁 important: inherit the same bg */
+  color: var(--text-light);
+  /* 🔁 ensure readable text in dark mode */
+  height: 100%;
+}
+
+.price-input input:focus {
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+
+
+.item-details-row {
+  margin-top: 5px;
+}
+
+.serial-input {
+  display: flex;
+  gap: 5px;
+}
+
+.serial-input input {
+  flex: 1;
+  height: var(--input-height);
+  width: var(--btn-icon-width);
+}
+
+.items-table {
+  margin-top: 20px;
+  border-top: 1px solid var(--border-light);
+  padding-top: 15px;
+}
+
+.items-table h3 {
+  margin: 0 0 10px 0;
+  font-size: 13px;
+  font-weight: normal;
+  color: var(--text-light);
+}
+
+.items-table table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border-light);
+  background-color: var(--table-bg-light, #fff);
+  color: var(--text-light);
+}
+
+.items-table th,
+.items-table td {
+  border: 1px solid var(--border-light);
+  padding: 5px;
+  text-align: left;
+  font-size: 11px;
+}
+
+.items-table th {
+  background-color: var(--table-header-light);
+  font-weight: normal;
+}
+
+.items-table td:nth-child(4),
+.items-table td:nth-child(5),
+.items-table td:nth-child(6) {
+  text-align: right;
+}
+
+.totals-section {
+  margin-top: 20px;
+  border-top: 1px solid var(--border-light);
+  padding-top: 15px;
+}
+
+.totals-row,
+.grand-total-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-bottom: 10px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+.keyboard-shortcuts {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  gap: 20px;
+  font-size: 10px;
+  color: var(--text-light);
+  flex-wrap: wrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .form-row {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .invoice-container {
+    padding: 5px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .totals-row,
+  .grand-total-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .keyboard-shortcuts {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
+
+/* Focus states for accessibility */
+input:focus,
+select:focus,
+button:focus {
+  outline: 2px solid var(--highlight);
+  outline-offset: 1px;
+}
+
+/* Empty table state */
+.items-table tbody:empty::after {
+  content: "No items added yet";
+  display: table-row;
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  padding: 20px;
+}
+
+.description {
+  display: flex;
+  flex-direction: column;
+}
+
+.description label {
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.description textarea {
+  resize: vertical;
+  padding: 5px;
+  font-size: 12px;
+  font-family: inherit;
+  border: 1px solid var(--border-light);
+  background-color: var(--form-light);
+  color: var(--text-light);
+  border-radius: 4px;
+  height: 40px;
+  width: 250px;
+}
+
+input,
+select,
+textarea {
+  transition: all 0.2s ease;
+}
+
+.price-input:focus-within {
+  box-shadow: 0 0 0 2px var(--highlight);
+}
