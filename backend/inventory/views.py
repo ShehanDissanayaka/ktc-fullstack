@@ -53,64 +53,54 @@ def generate_item_pdf(request, id):
     return response
 
 
-from django.template.loader import get_template
 from django.http import HttpResponse
+from django.template.loader import get_template
 from weasyprint import HTML
 from .models import ItemMaster
 from django.utils import timezone
-import base64
+import base64, os
 
 def generate_price_list_pdf(request):
+    print("📥 Called: generate_price_list_pdf")
+
     items = []
-    for obj in ItemMaster.objects.all().order_by('ITEM_model_number'):
-        # Prepare image in Base64
-        if obj.image and obj.image.path:
-            with open(obj.image.path, 'rb') as img_file:
-                image_data = base64.b64encode(img_file.read()).decode('utf-8')
-        else:
-            image_data = None  # handle missing image gracefully
+    try:
+        for obj in ItemMaster.objects.all().order_by('ITEM_model_number'):
+            print(f"🔄 Processing item: {obj.ITEM_code}")
 
-        # Prepare full description (left side)
-        full_description = f"""
-        <b>{obj.ITEM_name}</b><br/>
-        <b>Model: {obj.ITEM_model_number}</b><br/>
-        <span style='color:red;'><b>Spec / Capacity: {obj.ITEM_spec}</b></span><br/>
-        *** <b>{obj.ITEM_notes[3] if obj.ITEM_notes and len(obj.ITEM_notes) > 3 else ''}</b><br/>
-        *** <b>{obj.ITEM_notes[4] if obj.ITEM_notes and len(obj.ITEM_notes) > 4 else ''}</b><br/>
-        <span style='color:red;'><b>Brand Name: {obj.ITEM_brand_name}</b></span><br/>
-        <span style='color:red;'><b>Country of Origin: {obj.ITEM_origin_country}</b></span><br/>
-        <span style='color:red;'><b>Certificate: {obj.ITEM_certificate}</b></span><br/>
-        """
+            try:
+                if obj.image and hasattr(obj.image, 'path') and os.path.exists(obj.image.path):
+                    with open(obj.image.path, 'rb') as img_file:
+                        image_data = base64.b64encode(img_file.read()).decode('utf-8')
+                else:
+                    image_data = None
+            except Exception as e:
+                print(f"⚠️ Image error for {obj.ITEM_code}: {e}")
+                image_data = None
 
-        # Prepare label tag (right side)
-        label_tag = f"""
-        {obj.ITEM_name}<br/>
-        Model: {obj.ITEM_model_number}<br/>
-        Bowl Size: {obj.ITEM_spec}<br/>
-        LKR {obj.ITEM_normal_selling_price:,.0f}/-
-        """
+            description = f"<b>{obj.ITEM_name}</b><br/>..."
 
-        items.append({
-            'no': obj.ITEM_id,
-            'image_base64': image_data,
-            'description': full_description,
-            'price': f"LKR {obj.ITEM_normal_selling_price:,.2f}",
-            'special_price': obj.ITEM_purchase_price,  # you can adjust discount logic here
-            'label_tag': label_tag
-        })
+            items.append({
+                'no': obj.ITEM_id,
+                'image_base64': image_data,
+                'description': description,
+                'price': f"LKR {obj.ITEM_normal_selling_price:,.2f}",
+                'special_price': obj.ITEM_purchase_price,
+                'label_tag': obj.ITEM_name,
+            })
 
-    template = get_template("price_list_template.html")
-    context = {
-        "items": items,
-        "now": timezone.now(),
-    }
-    html_string = template.render(context)
+        template = get_template("price_list_template.html")
+        html_string = template.render({"items": items, "now": timezone.now()})
+        pdf_file = HTML(string=html_string).write_pdf()
 
-    pdf_file = HTML(string=html_string).write_pdf()
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename="price_list.pdf"'
+        return response
 
-    response = HttpResponse(pdf_file, content_type='application/pdf')
-    response['Content-Disposition'] = 'inline; filename="price_list.pdf"'
-    return response
+    except Exception as e:
+        print("🚨 PDF generation error:", e)
+        return HttpResponse("PDF generation failed", status=500)
+
 
 
 
