@@ -10,17 +10,25 @@ const CategoryMaster = () => {
   const [searchBy, setSearchBy] = useState("code");
   const [categories, setCategories] = useState([]);
   const searchInputRef = useRef(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+
 
   // 🚀 Fetch categories from the backend
   const fetchCategories = useCallback(async () => {
-  try {
-    const response = await axios.get("/categoryMasters/");
-    setCategories(response.data);
-  } catch (error) {
-    console.error("Error fetching categories:", error);
-  }
-}, []);
+    try {
+      const response = await axios.get("/categoryMasters/");
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  }, []);
 
+   // 🚀 Clear form fields
+  const handleNew = useCallback(() => {
+    setCategoryCode("");
+    setCategoryDescription("");
+    setSelectedCategoryId(null);
+  }, []);
 
   // 🚀 Save the new category to the backend
   const handleSave = useCallback(async () => {
@@ -30,26 +38,30 @@ const CategoryMaster = () => {
     }
 
     try {
-      await axios.post("/categoryMasters/", {
+      const payload = {
         CATEGORY_code: categoryCode.trim(),
         CATEGORY_description: categoryDescription.trim(),
-        CATEGORY_active: true, // Always active when created
-      });
+        CATEGORY_active: true,
+      };
 
-      alert("Category saved successfully!");
+      if (selectedCategoryId) {
+        await axios.put(`/categoryMasters/${selectedCategoryId}/`, payload);
+        alert("Category updated successfully!");
+      } else {
+        await axios.post("/categoryMasters/", payload);
+        alert("✅ Category saved successfully!");
+      }
+
       handleNew(); // Clear form
-      fetchCategories(); // Refresh categories
+      fetchCategories(); // Refresh list
     } catch (error) {
-      console.error("Error saving category:", error);
-      alert("Failed to save category.");
+      console.error("Error saving/updating category:", error);
+      alert("Failed to save or update category.");
     }
-  }, [categoryCode, categoryDescription, fetchCategories]);
+  }, [categoryCode, categoryDescription, selectedCategoryId, fetchCategories, handleNew]);
 
-  // 🚀 Clear form fields
-  const handleNew = useCallback(() => {
-    setCategoryCode("");
-    setCategoryDescription("");
-  }, []);
+ 
+
 
   // 🚀 Handle keyboard shortcuts
   useEffect(() => {
@@ -83,9 +95,36 @@ const CategoryMaster = () => {
     searchBy === "code"
       ? category.CATEGORY_code.toLowerCase().includes(search.toLowerCase())
       : category.CATEGORY_description
-          .toLowerCase()
-          .includes(search.toLowerCase())
+        .toLowerCase()
+        .includes(search.toLowerCase())
   );
+
+  // hadle edit function
+  const handleEditCategory = (category) => {
+    setSelectedCategoryId(category.id);
+    setCategoryCode(category.CATEGORY_code);
+    setCategoryDescription(category.CATEGORY_description);
+  };
+
+  // handle delete function
+
+  const handleDelete = useCallback(async () => {
+    if (!selectedCategoryId) return;
+
+    const confirmDelete = window.confirm("Are you sure you want to delete this category?");
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`/categoryMasters/${selectedCategoryId}/`);
+      alert("🗑️Category deleted successfully!");
+      handleNew(); // Clear form
+      fetchCategories(); // Refresh list
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      alert("Failed to delete category.");
+    }
+  }, [selectedCategoryId, fetchCategories, handleNew]);
+
 
   return (
     <div className="category-master-container">
@@ -116,6 +155,9 @@ const CategoryMaster = () => {
         <div className="button-row">
           <button onClick={handleSave}>Save</button>
           <button onClick={handleNew}>New</button>
+          <button onClick={handleDelete} disabled={!selectedCategoryId} className="delete-btn">
+            Delete
+          </button>
         </div>
       </div>
 
@@ -151,7 +193,11 @@ const CategoryMaster = () => {
             <tbody>
               {filteredCategories.length > 0 ? (
                 filteredCategories.map((category) => (
-                  <tr key={category.id}>
+                  <tr
+                    key={category.id}
+                    onClick={() => handleEditCategory(category)}
+                    className={selectedCategoryId === category.id ? "selected-row" : ""}
+                  >
                     <td>{category.CATEGORY_code}</td>
                     <td>{category.CATEGORY_description}</td>
                   </tr>
