@@ -233,12 +233,16 @@ const ItemMaster = () => {
                 data.append("image", imageFile);
             }
 
-            const res = await axios.post(API, data, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-                transformRequest: (formData) => formData  // Prevent Axios serialization
-            });
+            const res = form.id
+                ? await axios.put(`${API}${form.id}/`, data, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                    transformRequest: (formData) => formData
+                })
+                : await axios.post(API, data, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                    transformRequest: (formData) => formData
+                });
+
 
             if (res.status === 201) {
                 alert("✅ Item saved!");
@@ -268,10 +272,21 @@ const ItemMaster = () => {
 
 
 
-    const removeItem = () => {
-        if (!form.code) return alert("Enter a code to remove.");
-        alert("Remove not implemented (demo).");
+    const removeItem = async () => {
+        if (!form.id) return alert("Select an item to delete.");
+        if (!window.confirm("Are you sure you want to delete this item?")) return;
+
+        try {
+            await axios.delete(`${API}${form.id}/`);
+            alert("Item deleted.");
+            resetForm();
+            fetchItems();
+        } catch (err) {
+            console.error("Delete failed:", err);
+            alert("Failed to delete item.");
+        }
     };
+
 
     const printBarcode = () => {
         if (!form.barcodeAvailable) return alert("Barcode not available.");
@@ -331,6 +346,11 @@ const ItemMaster = () => {
     return (
         <div className="item-master-container">
             <div className="title">Item Master</div>
+            {form.id && (
+                <div className="editing-mode">
+                    Editing item: <strong>{form.code}</strong>
+                </div>
+            )}
 
             <div className="form-section">
                 <div className="left-column">
@@ -583,7 +603,6 @@ const ItemMaster = () => {
                     Download Price List PDF
                 </button>
 
-
             </div>
 
             <div className="search-section">
@@ -613,17 +632,17 @@ const ItemMaster = () => {
                             filtered.map(it => (
                                 <tr key={it.id}>
                                     <td>{it.code}</td>
-                                    <td>{it.description}</td>
+                                    <td>{it.description}
+                                    </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="2" style={{ textAlign: "center" }}>
-                                    No matching items
-                                </td>
+                                <td colSpan="3">No matching items</td>
                             </tr>
                         )}
                     </tbody>
+
                 </table>
 
             </div>

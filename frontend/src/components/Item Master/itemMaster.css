@@ -7,7 +7,7 @@
   background-color: var(--card-bg);
   padding: 20px;
   color: var(--text-color);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   transition: border-color 0.3s ease;
 }
 
@@ -338,6 +338,7 @@ th {
     transform: scale(0.9);
     opacity: 0;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -378,14 +379,17 @@ th {
 }
 
 .modal-content::-webkit-scrollbar-track {
-  background: #222; /* Dark background for the track */
+  background: #222;
+  /* Dark background for the track */
   border-radius: 4px;
 }
 
 .modal-content::-webkit-scrollbar-thumb {
-  background-color: #555; /* Dark gray scrollbar thumb */
+  background-color: #555;
+  /* Dark gray scrollbar thumb */
   border-radius: 4px;
-  border: 2px solid #222; /* To create padding effect */
+  border: 2px solid #222;
+  /* To create padding effect */
 }
 
 /* For Firefox */
@@ -394,4 +398,12 @@ th {
   scrollbar-color: #555 #222;
 }
 
-
+.editing-mode {
+  padding: 6px 12px;
+  background-color: #fff8db;
+  color: #a05c00;
+  border: 1px solid #ffe58f;
+  border-radius: 4px;
+  margin: 10px 0;
+  font-weight: 600;
+}

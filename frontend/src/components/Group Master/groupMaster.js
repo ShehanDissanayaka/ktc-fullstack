@@ -12,20 +12,21 @@ const GroupMaster = () => {
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedGroupId, setSelectedGroupId] = useState(null);
 
   const searchInputRef = useRef(null);
   const navigate = useNavigate();
 
   //Fetch Groups from API
   const fetchGroups = useCallback(async () => {
-  try {
-    const response = await axios.get("/groupMasters/");
-    setGroups(response.data);
-  } catch (error) {
-    console.error("Error fetching group data:", error);
-    alert("Error fetching group data. Please try again later.");
-  }
-}, []);
+    try {
+      const response = await axios.get("/groupMasters/");
+      setGroups(response.data);
+    } catch (error) {
+      console.error("Error fetching group data:", error);
+      alert("Error fetching group data. Please try again later.");
+    }
+  }, []);
 
 
   // 🔧 Save Group to API
@@ -36,28 +37,58 @@ const GroupMaster = () => {
     }
 
     try {
-      const response = await axios.post("/groupMasters/", {
+      const payload = {
         GROUP_code: groupCode,
         GROUP_description: groupDescription,
-      });
+      };
+
+      const response = selectedGroupId
+        ? await axios.put(`/groupMasters/${selectedGroupId}/`, payload)
+        : await axios.post("/groupMasters/", payload);
 
       if (response.status === 201 || response.status === 200) {
-        alert("✅ Group saved successfully!");
+        alert(selectedGroupId ? "✅ Group updated successfully!" : "✅ Group saved successfully!");
         setGroupCode("");
         setGroupDescription("");
+        setSelectedGroupId(null);
         fetchGroups();
       }
     } catch (err) {
-      console.error("❌ Error saving group:", err);
-      alert("Failed to save group. Please try again.");
+      console.error("❌ Error saving/updating group:", err);
+      alert("Failed to save or update group. Please try again.");
     }
-  }, [groupCode, groupDescription, fetchGroups]);
+  }, [groupCode, groupDescription, selectedGroupId, fetchGroups]);
+
+  // delete handler
+
+  const handleDelete = useCallback(async () => {
+    if (!selectedGroupId) return;
+
+    const confirmDelete = window.confirm("Are you sure you want to delete this group?");
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`/groupMasters/${selectedGroupId}/`);
+      alert("🗑️ Group deleted successfully!");
+      setGroupCode("");
+      setGroupDescription("");
+      setSelectedGroupId(null);
+      fetchGroups();
+    } catch (err) {
+      console.error("❌ Error deleting group:", err);
+      alert("Failed to delete group. Please try again.");
+    }
+  }, [selectedGroupId, fetchGroups]);
+
+
 
   // 🔧 Clear Form Fields
   const handleNew = useCallback(() => {
     setGroupCode("");
     setGroupDescription("");
+    setSelectedGroupId(null);
   }, []);
+
 
   // 🔧 Load Groups on Mount
   useEffect(() => {
@@ -95,6 +126,15 @@ const GroupMaster = () => {
     );
   }, [groups, search, searchBy]);
 
+  const handleEditGroup = (group) => {
+    setSelectedGroupId(group.id);
+    setGroupCode(group.GROUP_code);
+    setGroupDescription(group.GROUP_description);
+  };
+
+
+
+
   return (
     <div className="group-master-container">
       <h2 className="title">Group Master</h2>
@@ -122,6 +162,8 @@ const GroupMaster = () => {
         <div className="button-row">
           <button onClick={handleSave} className="save-btn">Save</button>
           <button onClick={handleNew} className="new-btn">New</button>
+          <button onClick={handleDelete} className="delete-btn" disabled={!selectedGroupId}>Delete</button>
+
         </div>
       </div>
 
@@ -158,10 +200,15 @@ const GroupMaster = () => {
               <tbody>
                 {filteredGroups.length > 0 ? (
                   filteredGroups.map((group) => (
-                    <tr key={group.id}>
+                    <tr
+                      key={group.id}
+                      onClick={() => handleEditGroup(group)}
+                      className={selectedGroupId === group.id ? "selected-row" : ""}
+                    >
                       <td>{group.GROUP_code}</td>
                       <td>{group.GROUP_description}</td>
                     </tr>
+
                   ))
                 ) : (
                   <tr>

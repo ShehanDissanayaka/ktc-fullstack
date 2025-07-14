@@ -173,3 +173,22 @@ th, td {
 .dark thead {
   background-color: #37474f; /* darker header */
 }
+
+.selected-row {
+  background-color: #2e9108;
+}
+
+.delete-btn {
+  background-color: #e53935;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #b71c1c;
+}
+
+.delete-btn:disabled {
+  background-color: #f19999;
+  color: #fff;
+  cursor: not-allowed;
+}
