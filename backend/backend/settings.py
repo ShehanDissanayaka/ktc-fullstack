@@ -50,7 +50,27 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+# ✅ Allow only your Netlify site
+CORS_ALLOWED_ORIGINS = [
+    "https://bright-marshmallow-2675ab.netlify.app",
+]
+
+# ✅ Allow PDF blob download (binary data)
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+# ✅ (Optional but safe) Allow credentials if you use auth
+CORS_ALLOW_CREDENTIALS = True
+
 
 ROOT_URLCONF = "backend.urls"
 
