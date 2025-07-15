@@ -53,12 +53,12 @@ def generate_item_pdf(request, id):
     return response
 
 
-import base64, requests
 from django.template.loader import get_template
 from weasyprint import HTML
 from django.http import HttpResponse
 from .models import ItemMaster
 from django.utils import timezone
+import base64, requests
 
 def generate_price_list_pdf(request):
     print("📥 Called: generate_price_list_pdf")
@@ -72,15 +72,13 @@ def generate_price_list_pdf(request):
             try:
                 if obj.image:
                     image_url = request.build_absolute_uri(obj.image.url)
-                    print(f"🌐 Fetching image from: {image_url}")
                     response = requests.get(image_url)
                     if response.status_code == 200:
                         image_data = base64.b64encode(response.content).decode('utf-8')
                     else:
-                        print(f"⚠️ Failed to fetch image: {response.status_code}")
+                        print(f"⚠️ Could not fetch image: {response.status_code}")
             except Exception as e:
-                print(f"🚨 Image fetch error for {obj.ITEM_code}: {e}")
-                image_data = None
+                print(f"🚨 Error loading image for {obj.ITEM_code}: {e}")
 
             description = f"<b>{obj.ITEM_name}</b><br/>{obj.ITEM_description or ''}"
 
@@ -104,6 +102,7 @@ def generate_price_list_pdf(request):
     except Exception as e:
         print("🚨 PDF generation error:", e)
         return HttpResponse("PDF generation failed", status=500)
+
 
 
 
