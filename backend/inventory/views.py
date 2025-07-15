@@ -53,32 +53,36 @@ def generate_item_pdf(request, id):
     return response
 
 
-from django.http import HttpResponse
+import base64, requests
 from django.template.loader import get_template
 from weasyprint import HTML
+from django.http import HttpResponse
 from .models import ItemMaster
 from django.utils import timezone
-import base64, os
 
 def generate_price_list_pdf(request):
     print("📥 Called: generate_price_list_pdf")
-
     items = []
+
     try:
         for obj in ItemMaster.objects.all().order_by('ITEM_model_number'):
             print(f"🔄 Processing item: {obj.ITEM_code}")
 
+            image_data = None
             try:
-                if obj.image and hasattr(obj.image, 'path') and os.path.exists(obj.image.path):
-                    with open(obj.image.path, 'rb') as img_file:
-                        image_data = base64.b64encode(img_file.read()).decode('utf-8')
-                else:
-                    image_data = None
+                if obj.image:
+                    image_url = request.build_absolute_uri(obj.image.url)
+                    print(f"🌐 Fetching image from: {image_url}")
+                    response = requests.get(image_url)
+                    if response.status_code == 200:
+                        image_data = base64.b64encode(response.content).decode('utf-8')
+                    else:
+                        print(f"⚠️ Failed to fetch image: {response.status_code}")
             except Exception as e:
-                print(f"⚠️ Image error for {obj.ITEM_code}: {e}")
+                print(f"🚨 Image fetch error for {obj.ITEM_code}: {e}")
                 image_data = None
 
-            description = f"<b>{obj.ITEM_name}</b><br/>..."
+            description = f"<b>{obj.ITEM_name}</b><br/>{obj.ITEM_description or ''}"
 
             items.append({
                 'no': obj.ITEM_id,
@@ -91,7 +95,7 @@ def generate_price_list_pdf(request):
 
         template = get_template("price_list_template.html")
         html_string = template.render({"items": items, "now": timezone.now()})
-        pdf_file = HTML(string=html_string).write_pdf()
+        pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
 
         response = HttpResponse(pdf_file, content_type='application/pdf')
         response['Content-Disposition'] = 'inline; filename="price_list.pdf"'
