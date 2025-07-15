@@ -5,165 +5,490 @@
     <meta charset="UTF-8">
     <title>Invoice - {{ invoice.INVOICE_H_number }}</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            font-size: 13px;
-            margin: 30px;
-            color: #333;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .company-header {
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .invoice-container {
+            width: 190mm;
+            /* slightly less than 210mm for margin */
+            min-height: auto;
+            /* let it grow naturally */
+            background: white;
+            margin: 0 auto;
+            padding: 0;
+            box-shadow: none;
+            /* no shadow in print */
+        }
+
+
+        .header {
             text-align: center;
             margin-bottom: 20px;
         }
 
-        .company-header h2 {
-            margin: 0;
+        .company-name {
             font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
 
-        .company-header p {
+        .company-details {
             font-size: 12px;
-            margin: 5px 0;
+            color: #666;
+            line-height: 1.4;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
+        .vat-reg {
+            margin-top: 5px;
+            font-size: 12px;
         }
 
-        th,
-        td {
+        .invoice-title {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            letter-spacing: 2px;
+        }
+
+        .invoice-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .customer-info,
+        .invoice-details {
+            width: 48%;
+        }
+
+        .info-box {
             border: 1px solid #000;
+            padding: 10px;
+            background-color: #f9f9f9;
+            font-size: 12px;
+        }
+
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .info-row {
+            margin-bottom: 3px;
+            line-height: 1.4;
+        }
+
+        .comments-section {
+            margin: 20px 0;
+            font-size: 12px;
+        }
+
+        .comments-row {
+            display: flex;
+            margin-bottom: 5px;
+        }
+
+        .comment-label {
+            width: 150px;
+            font-weight: bold;
+        }
+
+        .items-header {
+            display: flex;
+            border: 1px solid #000;
+            background-color: #f0f0f0;
             padding: 8px;
-            font-size: 13px;
+            margin-top: 20px;
+            font-size: 12px;
+            font-weight: bold;
         }
 
-        th {
-            background-color: #f2f2f2;
-            text-align: left;
+        .items-header .col-item-no {
+            width: 10%;
         }
 
-        .no-border {
-            border: none !important;
+        .items-header .col-description {
+            width: 40%;
         }
 
-        .text-right {
+        .items-header .col-price {
+            width: 15%;
             text-align: right;
+        }
+
+        .items-header .col-qty {
+            width: 10%;
+            text-align: center;
+        }
+
+        .items-header .col-discount {
+            width: 10%;
+            text-align: center;
+        }
+
+        .items-header .col-amount {
+            width: 15%;
+            text-align: center;
+        }
+
+        .items-row {
+            display: flex;
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            padding: 8px;
+            font-size: 12px;
+        }
+
+        .items-row .col-item-no {
+            width: 10%;
+        }
+
+        .items-row .col-description {
+            width: 40%;
+        }
+
+        .items-row .col-price {
+            width: 15%;
+            text-align: right;
+        }
+
+        .items-row .col-qty {
+            width: 10%;
+            text-align: center;
+        }
+
+        .items-row .col-discount {
+            width: 10%;
+            text-align: center;
+        }
+
+        .items-row .col-amount {
+            width: 15%;
+            text-align: right;
+        }
+
+        .empty-space {
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            height: 300px;
+        }
+
+        .totals-section {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .totals-content {
+            width: 300px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+            font-size: 12px;
+        }
+
+        .total-row:last-child {
+            border-bottom: 2px solid #000;
+            font-weight: bold;
+        }
+
+        .total-label {
+            font-weight: bold;
+        }
+
+        .total-amount {
+            text-align: right;
+            min-width: 100px;
         }
 
         .footer {
             margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .footer-left {
+            font-size: 12px;
+        }
+
+        .footer-right {
             text-align: center;
+            font-size: 12px;
         }
 
-        .signature {
-            margin-top: 40px;
+        .signature-line {
+            border-bottom: 1px solid #000;
+            width: 200px;
+            margin: 30px auto 5px auto;
+            height: 40px;
         }
 
-        .signature p {
-            margin: 30px 0 10px 0;
+        .customer-signature {
+            border-bottom: 1px solid #000;
+            width: 200px;
+            margin: 30px 0 5px 0;
+            height: 40px;
         }
 
-        .bold {
-            font-weight: bold;
+        .terms-section {
+            margin-top: 30px;
+            font-size: 11px;
+            line-height: 1.6;
+            border: 1px solid #ccc;
+            padding: 15px;
+            background-color: #fafafa;
+        }
+
+        .terms-section h4 {
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            text-decoration: underline;
+        }
+
+        .terms-section ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .customer-signature-block {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+
+        .signature-line-inline {
+            border-bottom: 1px solid #000;
+            width: 150px;
+            height: 30px;
+            margin-left: 10px;
+        }
+
+
+        @page {
+            size: A4;
+            margin: 15mm 15mm 20mm 15mm;
+        }
+
+
+        @media screen {
+            body {
+                background-color: #f5f5f5;
+                padding: 20px;
+            }
+
+            .invoice-container {
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                margin-top: 20px;
+            }
+        }
+
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+                margin: 0;
+            }
+
+            .invoice-container {
+                padding: 0;
+                margin: 0;
+            }
         }
     </style>
 </head>
 
 <body>
+    <div class="invoice-container">
+        <div class="header">
+            <div class="company-name">KITCHEN GALLERY ENTERPRISES (PVT) LTD</div>
+            <div class="company-details">
+                Southern Highway Pinnaduwa Entrance Road,<br>
+                Nugaduwa Junction,<br>
+                Galle, Sri Lanka.<br>
+                Tel: 0775768080 | Email: info@kitchengallery.lk
+            </div>
+            <div class="vat-reg">VAT Reg. No. - N/A</div>
+        </div>
 
-    <div class="company-header">
-        <h2>KITCHEN GALLERY ENTERPRISES (PVT) LTD</h2>
-        <p>Southern Highway Pinnaduwa Entrance Road,</p>
-        <p>Nugaduwa Junction,</p>
-        <P>Galle, Sri Lanka.</P>
-        <p>Tel: 0775768080 | Email: info@kitchengallery.lk</p>
-        <h3>INVOICE</h3>
+        <div class="invoice-title">INVOICE</div>
+
+        <div class="invoice-info">
+            <div class="customer-info">
+                <div class="info-box">
+                    <div class="info-title">Customer</div>
+                    <div class="info-row">: {{ invoice.INVOICE_H_customer.CUSTOMER_code }}</div>
+                    <div class="info-row">: {{ invoice.INVOICE_H_customer.CUSTOMER_name }}</div>
+                    <div class="info-row">: {{ invoice.INVOICE_H_customer.CUSTOMER_address }}</div>
+                    <div class="info-row">: {{ invoice.INVOICE_H_customer.CUSTOMER_city }}</div>
+                    <div class="info-row">Contact No. : {{ invoice.INVOICE_H_customer.CUSTOMER_tele_mobile }}</div>
+                    <div class="info-row">Cust. Info. :</div>
+                </div>
+            </div>
+
+            <div class="invoice-details">
+                <div class="info-box">
+                    <div class="info-row">Invoice No. : {{ invoice.INVOICE_H_number }}</div>
+                    <div class="info-row">Date : {{ invoice.INVOICE_H_datetime|date:"d M Y" }}</div>
+                    <div class="info-row">Order No. : {{ invoice.INVOICE_H_code }}</div>
+                    <div class="info-row">Sales Person : {{ invoice.INVOICE_H_sales_rep }}</div>
+                    <div class="info-row">Payment Type : {{ invoice.INVOICE_H_payment_term }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="comments-section">
+            <div class="comments-row">
+                <span class="comment-label">General Comments :</span>
+            </div>
+            <div class="comments-row">
+                <span class="comment-label">Delivery Comments :</span>
+                <span>{{ invoice.INVOICE_H_remakrs }}</span>
+            </div>
+            <div class="comments-row">
+                <span class="comment-label">Additional Comments</span>
+            </div>
+        </div>
+
+        <div class="items-header">
+            <div class="col-item-no">Item No.</div>
+            <div class="col-description">Item Description</div>
+            <div class="col-price">Price</div>
+            <div class="col-qty">Qty</div>
+            <div class="col-discount">Discount %</div>
+            <div class="col-amount">Net Amount</div>
+        </div>
+
+        {% for item in details %}
+        <div class="items-row">
+            <div class="col-item-no">
+                {% if item.INVOICE_D_item %}
+                {{ item.INVOICE_D_item.ITEM_code }}
+                {% else %}
+                (N/A)
+                {% endif %}
+            </div>
+            <div class="col-description">
+                {% if item.INVOICE_D_item %}
+                {{ item.INVOICE_D_item.ITEM_description }}
+                {% else %}
+                (No Description)
+                {% endif %}
+            </div>
+            <div class="col-price">{{ item.INVOICE_D_rate|floatformat:2 }}</div>
+            <div class="col-qty">{{ item.INVOICE_D_qty|floatformat:2 }}</div>
+            <div class="col-discount">
+                {% if item.INVOICE_D_discount_value > 0 %}
+                {{ item.INVOICE_D_discount_value }}
+                {% else %}
+                -
+                {% endif %}
+            </div>
+            <div class="col-amount">
+                {{ item.INVOICE_D_total|floatformat:2 }}
+            </div>
+
+
+
+        </div>
+        {% endfor %}
+
+        <div class="empty-space"></div>
+
+        <div class="totals-section">
+            <div class="totals-content">
+                <div class="total-row">
+                    <div class="total-label">Subtotal :</div>
+                    <div class="total-amount">{{ subtotal|floatformat:2 }}</div>
+                </div>
+                <div class="total-row">
+                    <div class="total-label">Total Discount :</div>
+                    <div class="total-amount">{{ invoice.INVOICE_H_total_discount|floatformat:2 }}%</div>
+                </div>
+                <div class="total-row">
+                    <div class="total-label">Grand Total :</div>
+                    <div class="total-amount">{{ invoice.INVOICE_H_grand_total|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="terms-section">
+            <h4>Warranty Conditions</h4>
+            <ul>
+                <li>Machinery products are covered by a 6-month company warranty from delivery, followed by a fee-based
+                    warranty.</li>
+                <li>Manufacturer faults only are covered. Hazards due to high voltage, lightning, or physical damage are
+                    excluded.</li>
+                <li>We recommend using power protection and insurance for all electrical appliances.</li>
+                <li>Unauthorized modifications, repairs, or negligence voids all warranties and guarantees.</li>
+            </ul>
+
+            <h4>General Terms</h4>
+            <ul>
+                <li>All prices include applicable taxes.</li>
+                <li>Advance payments are non-refundable, except for delivery delays or stock unavailability.</li>
+            </ul>
+
+            <h4>External Courier Terms</h4>
+            <ul>
+                <li>Courier fees are borne by the receiver per the courier company’s policy.</li>
+                <li>We are not liable for damage, loss, or delays once goods are handed to the courier.</li>
+                <li>Goods are dispatched the same day if deposit confirmation is received before 11:00 AM.</li>
+                <li>Confirmations after 11:00 AM will be processed the next working day. No deliveries on weekends or
+                    holidays.</li>
+                <li>Complaints must be made directly to the courier company.</li>
+                <li>Customers should contact the courier for delivery status updates. Usual delivery is within 2 working
+                    days.</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <div class="footer-left">
+                <div>Collected above items in good condition</div>
+
+                <div class="customer-signature-block">
+                    <div class="label">Customer Name</div>
+                    <div class="signature-line-inline"></div>
+                    <div class="label" style="margin-left: 10px;">Signature:</div>
+
+
+                </div>
+            </div>
+
+            <div class="footer-right">
+                <div>For KITCHEN GALLERY</div>
+                <div class="signature-line"></div>
+                <div>Authorized Signatory</div>
+                <div style="margin-top: 30px;">
+                    <div style="border-bottom: 1px solid #000; width: 150px; margin: 0 auto; height: 30px;"></div>
+                    <div>Date</div>
+                </div>
+            </div>
+        </div>
+
+
+
     </div>
-
-    <table>
-        <tr>
-            <td class="bold">Customer:</td>
-            <td>{{ invoice.INVOICE_H_customer.CUSTOMER_name }}<br>{{ invoice.INVOICE_H_customer.CUSTOMER_address }}</td>
-            <td class="bold">Invoice No:</td>
-            <td>{{ invoice.INVOICE_H_number }}</td>
-        </tr>
-        <tr>
-            <td class="bold">Contact No:</td>
-            <td>{{ invoice.INVOICE_H_customer.CUSTOMER_tele_mobile }}</td>
-            <td class="bold">Date:</td>
-            <td>{{ invoice.INVOICE_H_datetime|date:"d M Y" }}</td>
-        </tr>
-        <tr>
-            <td class="bold">Payment Type:</td>
-            <td>{{ invoice.INVOICE_H_payment_term }}</td>
-            <td class="bold">Sales Rep:</td>
-            <td>{{ invoice.INVOICE_H_sales_rep }}</td>
-        </tr>
-    </table>
-
-    <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Item Code</th>
-                <th>Description</th>
-                <th class="text-right">Rate (Rs)</th>
-                <th class="text-right">Qty</th>
-
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in details %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>
-                    {% if item.INVOICE_D_item %}
-                    {{ item.INVOICE_D_item.ITEM_code }}
-                    {% else %}
-                    (no item)
-                    {% endif %}
-                </td>
-                <td>
-                    {% if item.INVOICE_D_item %}
-                    {{ item.INVOICE_D_item.ITEM_description }}
-                    {% else %}
-                    (no description)
-                    {% endif %}
-                </td>
-
-                <td class="text-right">{{ item.INVOICE_D_rate|floatformat:2 }}</td>
-                <td class="text-right">{{ item.INVOICE_D_qty|floatformat:2 }}</td>
-
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <table>
-        <tr>
-            <td colspan="5" class="no-border text-right">Subtotal:</td>
-            <td class="text-right">{{ subtotal|floatformat:2 }}</td>
-            </td>
-        </tr>
-        
-        <tr>
-            <td colspan="5" class="no-border text-right">Total Discount:</td>
-            <td class="text-right">{{ invoice.INVOICE_H_total_discount|floatformat:2 }}</td>
-        </tr>
-        <tr>
-            <td colspan="5" class="no-border text-right bold">Grand Total:</td>
-            <td class="text-right bold">{{ invoice.INVOICE_H_grand_total|floatformat:2 }}</td>
-        </tr>
-    </table>
-
-    <div class="signature">
-        <p>Authorized Signature: __________________________</p>
-        <p>Customer Signature: ____________________________</p>
-    </div>
-
 </body>
 
 </html>

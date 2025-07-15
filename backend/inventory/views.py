@@ -209,6 +209,10 @@ def print_invoice_by_number(request, number):
 
     subtotal = sum(d.INVOICE_D_qty * d.INVOICE_D_rate for d in details)
 
+    # ✅ Calculate total for each item
+    for d in details:
+        d.INVOICE_D_total = (d.INVOICE_D_qty * d.INVOICE_D_rate) - (d.INVOICE_D_discount_value or 0)
+
     html_string = render(
         request,
         'invoice_print.html',
@@ -230,5 +234,3 @@ def print_invoice_by_number(request, number):
             'details': details,
             'subtotal': subtotal
         })
-
-
