@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import dj_database_url
+from corsheaders.defaults import default_headers
 
 # BASE DIR
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -56,16 +57,8 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # ✅ Allow PDF blob download (binary data)
-CORS_ALLOW_HEADERS = [
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "dnt",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "content-disposition",  # required for file downloads like PDFs
 ]
 
 # ✅ (Optional but safe) Allow credentials if you use auth
