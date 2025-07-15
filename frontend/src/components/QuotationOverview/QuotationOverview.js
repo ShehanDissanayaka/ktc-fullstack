@@ -157,7 +157,7 @@ const QuotationOverview = () => {
             <div className="top-sections">
                 {/* Left Section */}
                 <div className="section header-section">
-                    <div className="input-group"><label>Code</label><input name="QUH_code" value={header.QUH_code} onChange={handleHeaderChange} /></div>
+                    <div className="input-group"><label>Quotation Number</label><input name="QUH_code" value={header.QUH_code} onChange={handleHeaderChange} /></div>
                     <div className="input-group"><label>Pay Type</label><input name="QUH_pay_type" value={header.QUH_pay_type} onChange={handleHeaderChange} /></div>
                     <div className="input-group"><label>Validity (Days)</label><input name="QUH_validity" value={header.QUH_validity} onChange={handleHeaderChange} /></div>
                     <div className="input-group"><label>Location</label><input name="QUH_location" value={header.QUH_location} onChange={handleHeaderChange} /></div>

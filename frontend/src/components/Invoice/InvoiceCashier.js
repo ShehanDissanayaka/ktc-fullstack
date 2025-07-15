@@ -64,16 +64,19 @@ const InvoiceCashier = () => {
     console.log("Adding newItem with id:", selectedItem.ITEM_id);
 
     const newItem = {
-      id: selectedItem.ITEM_id,  // Use ITEM_id as your unique ID
+      id: selectedItem.ITEM_id,
       itemCode: selectedItem.ITEM_code,
       description: selectedItem.ITEM_description,
       warranty: invoiceData.warranty,
       rate: parseFloat(invoiceData.rate) || 0,
       qty: parseInt(invoiceData.qty) || 0,
-      total: (parseFloat(invoiceData.rate) || 0) * (parseInt(invoiceData.qty) || 0),
+      inlineDiscount: 0, // new field
+      total: 0 // will calculate below
     };
+    newItem.total = (newItem.rate * newItem.qty) - newItem.inlineDiscount;
 
     setItems(prev => [...prev, newItem]);
+
 
     // Reset fields
     setInvoiceData(prev => ({
@@ -95,11 +98,19 @@ const InvoiceCashier = () => {
   };
 
   const calculateTotal = () => {
-    const subtotal = calculateSubtotal();
     const commission = parseFloat(invoiceData.commission) || 0;
-    const discount = parseFloat(invoiceData.discount) || 0;
-    return subtotal + commission - discount;
+    const invoiceLevelDiscount = parseFloat(invoiceData.discount) || 0;
+
+    const subtotalWithInlineDiscount = items.reduce((sum, item) => sum + item.total, 0);
+    const totalWithoutInlineDiscount = items
+      .filter(item => !item.inlineDiscount || item.inlineDiscount === 0)
+      .reduce((sum, item) => sum + (item.rate * item.qty), 0);
+
+    const grandTotal = subtotalWithInlineDiscount + commission - invoiceLevelDiscount;
+
+    return grandTotal;
   };
+
 
   const handleSave = async () => {
 
@@ -124,9 +135,9 @@ const InvoiceCashier = () => {
         INVOICE_D_item: item.id,
         INVOICE_D_qty: item.qty,
         INVOICE_D_rate: item.rate,
-        INVOICE_D_discount_value: 0,
+        INVOICE_D_discount_value: item.inlineDiscount || 0,
+        INVOICE_D_discount_total: item.inlineDiscount || 0,
         INVOICE_D_discount_type: "Value",
-        INVOICE_D_discount_total: 0,
         INVOICE_D_warranty_month: item.warranty === "1year" ? 12 : 24,
         INVOICE_D_vat: 0,
         INVOICE_D_vat_rate: 0,
@@ -272,6 +283,20 @@ const InvoiceCashier = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  const calculateNetValue = () => {
+    const discountPercentage = parseFloat(invoiceData.discount) || 0;
+
+    const inlineDiscounted = items.filter(item => item.inlineDiscount && item.inlineDiscount > 0);
+    const nonInlineDiscounted = items.filter(item => !item.inlineDiscount || item.inlineDiscount === 0);
+
+    const inlineTotal = inlineDiscounted.reduce((sum, item) => sum + item.total, 0);
+    const nonInlineTotal = nonInlineDiscounted.reduce((sum, item) => sum + (item.rate * item.qty), 0);
+
+    const discountAmount = (discountPercentage / 100) * nonInlineTotal;
+    const discountedTotal = nonInlineTotal - discountAmount;
+
+    return inlineTotal + discountedTotal;
+  };
 
   return (
     <div className="invoice-container">
@@ -471,6 +496,7 @@ const InvoiceCashier = () => {
                 <th>Warranty</th>
                 <th>Rate</th>
                 <th>Qty</th>
+                <th>Discount</th>
                 <th>Total</th>
               </tr>
             </thead>
@@ -482,6 +508,19 @@ const InvoiceCashier = () => {
                   <td>{item.warranty}</td>
                   <td>Rs {item.rate.toFixed(2)}</td>
                   <td>{item.qty}</td>
+                  <td>
+                    <input
+                      type="number"
+                      value={item.inlineDiscount}
+                      onChange={(e) => {
+                        const updatedItems = [...items];
+                        updatedItems[index].inlineDiscount = parseFloat(e.target.value) || 0;
+                        updatedItems[index].total = (updatedItems[index].rate * updatedItems[index].qty) - updatedItems[index].inlineDiscount;
+                        setItems(updatedItems);
+                      }}
+                      style={{ width: "80px" }}
+                    />
+                  </td>
                   <td>Rs {item.total.toFixed(2)}</td>
                 </tr>
               ))}
@@ -490,78 +529,52 @@ const InvoiceCashier = () => {
         </div>
 
         {/* Totals Section */}
-        <div className="totals-section">
-          <div className="totals-row">
-            <div className="form-group">
-              <label>Commission</label>
-              <div className="price-input">
-                <span>Rs</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={invoiceData.commission}
-                  onChange={(e) => handleInputChange('commission', e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="form-group">
-              <label>Discount</label>
-              <div className="price-input">
-                <span>Rs</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={invoiceData.discount}
-                  onChange={(e) => handleInputChange('discount', e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="form-group">
-              <select
-                value={invoiceData.discountType}
-                onChange={(e) => handleInputChange('discountType', e.target.value)}
-              >
-                <option value="Value">Value</option>
-                <option value="Percentage">Percentage</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label>Total</label>
-              <div className="price-input">
-                <span>Rs</span>
-                <input
-                  type="text"
-                  value={calculateSubtotal().toFixed(2)}
-                  readOnly
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="grand-total-row">
-            <div className="form-group">
-              <label>Total</label>
-              <div className="price-input">
-                <span>Rs</span>
-                <input
-                  type="text"
-                  value={calculateSubtotal().toFixed(2)}
-                  readOnly
-                />
-              </div>
-            </div>
-            <div className="form-group">
-              <label>Grand Total</label>
-              <div className="price-input">
-                <span>Rs</span>
-                <input
-                  type="text"
-                  value={calculateTotal().toFixed(2)}
-                  readOnly
-                />
-              </div>
-            </div>
-          </div>
+        {/* Totals Section - redesigned */}
+        <div style={{
+          marginLeft: "auto", // Pushes container to right
+          width: "30%",
+          display: "flex",
+          justifyContent: "flex-end", // Aligns table to right within container
+          paddingLeft: "10px", // Fixed typo (camelCase)
+          marginTop: "20px"
+        }}>
+          <table className="totals-table" style={{ width: "100%" }}>
+            <tbody>
+              {/* Table rows remain unchanged */}
+              <tr>
+                <td style={{ textAlign: "right", fontWeight: "bold", whiteSpace: "nowrap", width: "1%" }}>
+                  Grand Total:
+                </td>
+                <td style={{ textAlign: "right" }}>
+                  Rs {calculateSubtotal().toFixed(2)}
+                </td>
+              </tr>
+              <tr>
+                <td style={{ textAlign: "right", fontWeight: "bold", whiteSpace: "nowrap", width: "1%" }}>
+                  Discount (%):
+                </td>
+                <td style={{ textAlign: "right" }}>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                    value={invoiceData.discount}
+                    onChange={(e) => handleInputChange("discount", e.target.value)}
+                    style={{ width: "60px", textAlign: "right" }}
+                  /> %
+                </td>
+              </tr>
+              <tr>
+                <td style={{ textAlign: "right", fontWeight: "bold", whiteSpace: "nowrap", width: "1%" }}>
+                  Net Value:
+                </td>
+                <td style={{ textAlign: "right" }}>
+                  Rs {calculateNetValue().toFixed(2)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         {/* Action Buttons */}
