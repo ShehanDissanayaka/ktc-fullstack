@@ -51,7 +51,7 @@
 
     {% if item.image and item.ITEM_type == "warranty" %}
         <div class="section">
-            <img src="file://{{ image_path }}" />
+            <img src="{{ item.image.url }}" />
         </div>
     {% endif %}
 

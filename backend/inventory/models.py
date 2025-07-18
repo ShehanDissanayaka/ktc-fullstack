@@ -204,3 +204,8 @@ class InvoiceDetail(models.Model):
 
     class Meta:
         db_table = "INV_Invoice_D"
+
+from cloudinary.models import CloudinaryField
+
+class ItemMaster(models.Model):
+    image = CloudinaryField('image', blank=True, null=True)
