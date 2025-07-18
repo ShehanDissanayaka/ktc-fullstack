@@ -27,11 +27,10 @@ class ItemMasterViewSet(viewsets.ModelViewSet):
     queryset = ItemMaster.objects.all().order_by('-ITEM_id')
     serializer_class = ItemMasterSerializer
 
-from django.template.loader import get_template
-from xhtml2pdf import pisa
+from weasyprint import HTML
+from django.template.loader import render_to_string
+import requests, base64
 from django.http import HttpResponse
-from .models import ItemMaster
-import os
 
 def generate_item_pdf(request, id):
     try:
@@ -39,18 +38,29 @@ def generate_item_pdf(request, id):
     except ItemMaster.DoesNotExist:
         return HttpResponse("Item not found", status=404)
 
-    template = get_template("item_pdf_template.html")
+    # Fetch image from Cloudinary and encode it
+    image_base64 = None
+    if item.image:
+        try:
+            image_url = item.image.url
+            response = requests.get(image_url)
+            if response.status_code == 200:
+                image_base64 = base64.b64encode(response.content).decode('utf-8')
+        except Exception as e:
+            print(f"⚠️ Failed to fetch image: {e}")
+
     context = {
         "item": item,
-        "image_path": item.image.path if item.image else None
+        "image_base64": image_base64,
     }
-    html = template.render(context)
 
-    response = HttpResponse(content_type='application/pdf')
-    pisa_status = pisa.CreatePDF(html, dest=response)
-    if pisa_status.err:
-        return HttpResponse("PDF generation failed", status=500)
+    html_string = render_to_string("item_pdf_template.html", context)
+    pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
+
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="item_{item.ITEM_code}.pdf"'
     return response
+
 
 
 from django.template.loader import get_template
