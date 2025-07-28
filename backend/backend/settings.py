@@ -16,7 +16,8 @@ SECRET_KEY = os.environ.get(
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 # ALLOWED HOSTS
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
+ALLOWED_HOSTS = ["inventory-backend-02vy.onrender.com", "localhost", "127.0.0.1"]
+
 
 # APPLICATIONS
 INSTALLED_APPS = [
