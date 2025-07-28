@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: inventory-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn backend.wsgi:application
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        value: django-insecure-p8dn&&na8r2weuu#6e)@0%s*ykk*(-xtrya%l@4!&0e!v&qyg*
+      - key: ALLOWED_HOSTS
+        value: your-backend.onrender.com
+      - key: CLOUDINARY_CLOUD_NAME
+        value: dvvjsbqqt
+      - key: CLOUDINARY_API_KEY
+        value: 692831147957173
+      - key: CLOUDINARY_API_SECRET
+        value: 1rF4lDsBEJN2m4NpHp5PsW6TzP0
