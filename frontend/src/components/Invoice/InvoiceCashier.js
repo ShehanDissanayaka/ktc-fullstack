@@ -84,7 +84,7 @@ const InvoiceCashier = () => {
       itemCode: '',
       description: '',
       rate: '0.00',
-      qty: '0',
+      qty: '1',
       warranty: '',
       serialNumbers: ''
     }));
@@ -265,7 +265,7 @@ const InvoiceCashier = () => {
           description: '',
           sellingPrice: '0.00',
           rate: '0.00',
-          qty: '0',
+          qty: '1',
           warranty: '',
           serialNumbers: '',
           commission: '0.00',
@@ -312,7 +312,7 @@ const InvoiceCashier = () => {
             <div className="form-group">
               <label>Quotation Number</label>
               <input
-                type="text"
+                type="number"
                 value={invoiceData.tokenNumber}
                 onChange={(e) => handleInputChange('tokenNumber', e.target.value)}
               />
