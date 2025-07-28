@@ -27,6 +27,7 @@ class CategoryMaster(models.Model):
 
 import uuid
 
+from cloudinary.models import CloudinaryField
 class ItemMaster(models.Model):
     ITEM_TYPE_CHOICES = [
         ('warranty', 'Warranty'),
@@ -81,7 +82,7 @@ class ItemMaster(models.Model):
     ITEM_net_weight = models.CharField(max_length=100, blank=True, null=True)
 
     ITEM_notes = models.JSONField(default=list, blank=True, null=True)
-    image = models.ImageField(upload_to='item_images/', blank=True, null=True)
+    image = CloudinaryField('image', blank=True, null=True)
 
     class Meta:
         db_table = "INV_Item_Master"
@@ -205,7 +206,4 @@ class InvoiceDetail(models.Model):
     class Meta:
         db_table = "INV_Invoice_D"
 
-from cloudinary.models import CloudinaryField
 
-class ItemMaster(models.Model):
-    image = CloudinaryField('image', blank=True, null=True)
