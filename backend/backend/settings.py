@@ -89,10 +89,7 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # DATABASES
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.environ.get(
-            "DATABASE_URL",
-            f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
-        ),
+        default="postgresql://inventory_user:Haggt9Kj5yW99fGAO2Pi1bj1qHQLpAPJ@dpg-d25gfanfte5s73856a50-a.oregon-postgres.render.com/inventory_db_lkdr",
         conn_max_age=600,
         conn_health_checks=True,
     )
