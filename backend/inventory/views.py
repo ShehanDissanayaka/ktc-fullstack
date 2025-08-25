@@ -247,3 +247,109 @@ def print_invoice_by_number(request, number):
             'details': details,
             'subtotal': subtotal
         })
+
+from django.db.models import Sum, F, DecimalField, ExpressionWrapper
+from django.db.models.functions import TruncDate
+from datetime import date, timedelta
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+from .models import InvoiceHeader, InvoiceDetail, ItemMaster
+
+
+class DashboardMetricsView(APIView):
+    def get(self, request):
+        today = date.today()
+        start_14 = today - timedelta(days=13)
+        start_30 = today - timedelta(days=29)
+        start_month = today.replace(day=1)
+
+        # line total per row
+        line_total = ExpressionWrapper(
+            F("INVOICE_D_qty") * F("INVOICE_D_rate")
+            - F("INVOICE_D_discount_total")
+            + F("INVOICE_D_vat"),
+            output_field=DecimalField(max_digits=14, decimal_places=2),
+        )
+
+        # Today’s stats
+        today_details = InvoiceDetail.objects.filter(INVOICE_D_h__INVOICE_H_datetime__date=today)
+        today_revenue = today_details.aggregate(v=Sum(line_total))["v"] or 0
+        items_sold_today = today_details.aggregate(q=Sum("INVOICE_D_qty"))["q"] or 0
+        invoices_today = InvoiceHeader.objects.filter(INVOICE_H_datetime__date=today).count()
+        avg_order_value_today = today_revenue / invoices_today if invoices_today else 0
+
+        # ✅ Items sold today by type
+        breakdown_qs = (
+            today_details.values("INVOICE_D_item__ITEM_type")
+            .annotate(total_qty=Sum("INVOICE_D_qty"))
+        )
+
+        item_type_distribution = {
+            "warranty": 0,
+            "non_warranty": 0,
+            "utensil": 0,
+            "spare": 0,
+        }
+
+        for row in breakdown_qs:
+            t = row["INVOICE_D_item__ITEM_type"]
+            if t in item_type_distribution:
+                item_type_distribution[t] = float(row["total_qty"] or 0)
+
+        # Month-to-date revenue
+        mtd_revenue = (
+            InvoiceDetail.objects.filter(INVOICE_D_h__INVOICE_H_datetime__date__gte=start_month)
+            .aggregate(v=Sum(line_total))["v"]
+            or 0
+        )
+
+        # Sales by day (last 14 days)
+        last14 = (
+            InvoiceDetail.objects.filter(INVOICE_D_h__INVOICE_H_datetime__date__gte=start_14)
+            .annotate(d=TruncDate("INVOICE_D_h__INVOICE_H_datetime"))
+            .values("d")
+            .annotate(revenue=Sum(line_total), qty=Sum("INVOICE_D_qty"))
+            .order_by("d")
+        )
+        sales_by_day = [
+            {"date": r["d"].isoformat(), "revenue": float(r["revenue"] or 0), "qty": float(r["qty"] or 0)}
+            for r in last14
+        ]
+
+        # Top items last 30 days
+        top_items_qs = (
+            InvoiceDetail.objects.filter(INVOICE_D_h__INVOICE_H_datetime__date__gte=start_30)
+            .values("INVOICE_D_item__ITEM_code", "INVOICE_D_item__ITEM_name")
+            .annotate(qty=Sum("INVOICE_D_qty"), revenue=Sum(line_total))
+            .order_by("-qty")[:10]
+        )
+        top_items = [
+            {
+                "code": r["INVOICE_D_item__ITEM_code"],
+                "name": r["INVOICE_D_item__ITEM_name"],
+                "qty": float(r["qty"] or 0),
+                "revenue": float(r["revenue"] or 0),
+            }
+            for r in top_items_qs
+        ]
+
+        # Global totals
+        items_count = ItemMaster.objects.count()
+        invoices_count = InvoiceHeader.objects.count()
+
+        # ✅ Return JSON Response
+        return Response({
+            "kpis": {
+                "todayRevenue": float(today_revenue),
+                "invoicesToday": invoices_today,
+                "itemsSoldToday": float(items_sold_today),
+                "avgOrderValueToday": float(avg_order_value_today),
+                "mtdRevenue": float(mtd_revenue),
+                "itemsCount": items_count,
+                "invoicesCount": invoices_count,
+            },
+            "salesByDay": sales_by_day,
+            "topItems": top_items,
+            "itemTypeDistribution": item_type_distribution,  # ✅ all 4 categories
+        })

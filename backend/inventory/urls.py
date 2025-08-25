@@ -11,6 +11,7 @@ from .views import (
     generate_quotation_pdf,
     CustomerViewSet,
     InvoiceViewSet,
+    DashboardMetricsView,
 )
 from . import views  # ✅ This line is required for `views.print_invoice`
 
@@ -29,5 +30,6 @@ urlpatterns = [
     path("price-list/pdf/", generate_price_list_pdf, name="generate_price_list_pdf"),
     path("quotation/<int:id>/pdf/", generate_quotation_pdf, name="generate_quotation_pdf"),
     path("invoice-by-number/<str:number>/print/", views.print_invoice_by_number, name="invoice-print-by-number"),
+    path("dashboard/", DashboardMetricsView.as_view(), name="dashboard-metrics"),
 
 ]
