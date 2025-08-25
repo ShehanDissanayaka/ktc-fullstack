@@ -23,7 +23,7 @@ const Dashboard = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/dashboard/")
+    fetch("/dashboard/")
       .then((res) => res.json())
       .then((data) => {
         setData(data);
