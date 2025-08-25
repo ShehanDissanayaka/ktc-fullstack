@@ -23,17 +23,19 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetch("/dashboard/")
-      .then((res) => res.json())
-      .then((data) => {
-        setData(data);
-        setLoading(false);
-      })
-      .catch((err) => {
+ useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const response = await axios.get("/dashboard/"); // ✅ axios handles baseURL
+        setData(response.data);
+      } catch (err) {
         console.error("❌ Dashboard fetch error:", err);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchDashboard();
   }, []);
 
   if (loading) return <p>Loading...</p>;
