@@ -108,9 +108,11 @@ def generate_price_list_pdf(request):
     items = []
 
     try:
-        for obj in ItemMaster.objects.all().order_by('ITEM_model_number'):
+        # ✅ LIMIT to first 20 items
+        for obj in ItemMaster.objects.all().order_by('ITEM_model_number')[:20]:
+            print(f"🔄 Processing item: {obj.ITEM_code}")
 
-            # ✅ Convert image to base64 (stable for WeasyPrint)
+            # ✅ Convert image to base64 (so WeasyPrint doesn’t fetch externally)
             image_data = None
             try:
                 if obj.image:
@@ -123,7 +125,7 @@ def generate_price_list_pdf(request):
             except Exception as e:
                 print(f"🚨 Error loading image for {obj.ITEM_code}: {e}")
 
-            # ✅ Normalized fields (avoid brand_name vs brand mismatch)
+            # ✅ Normalized fields
             items.append({
                 "no": obj.ITEM_id,
                 "image_base64": image_data,
@@ -147,6 +149,8 @@ def generate_price_list_pdf(request):
             "items": items,
             "now": timezone.now()
         })
+
+        # ✅ Generate PDF
         pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
 
         response = HttpResponse(pdf_file, content_type="application/pdf")
@@ -157,8 +161,8 @@ def generate_price_list_pdf(request):
         print("🚨 PDF generation error:", e)
         traceback.print_exc()
         return HttpResponse("PDF generation failed", status=500)
-        
-          
+    
+
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from .models import QuotationHeader
