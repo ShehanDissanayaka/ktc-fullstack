@@ -18,9 +18,17 @@
             margin-bottom: 20px;
         }
 
+        .logo {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            width: 120px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 80px; /* Push table below logo */
         }
 
         th,
@@ -38,19 +46,39 @@
         .center {
             text-align: center;
         }
+
+        /* Field styles */
+        .name,
+        .model,
+        .dimension {
+            font-weight: bold;
+            color: #000; /* black bold */
+        }
+
+        .spec,
+        .brand,
+        .origin,
+        .certificate {
+            font-weight: bold;
+            color: red; /* red bold */
+        }
     </style>
 </head>
 
 <body>
+    <!-- LOGO TOP-LEFT -->
+    <img src="{{ logo_url }}" class="logo" />
+
     <h1>KTC INVENTORY - PRICE LIST</h1>
-    <p>Generated: {{ now|date:"Y-m-d H:i" }}</p>
+    {% load tz %}
+    <p style="text-align:right; font-size:9pt;">Generated: {{ now|date:"Y-m-d H:i" }}</p>
 
     <table>
         <thead>
             <tr>
                 <th style="width: 5%;">No</th>
                 <th style="width: 15%;">Image</th>
-                <th style="width: 40%;">Description</th>
+                <th style="width: 40%;">Details</th>
                 <th style="width: 15%;">Unit Price</th>
                 <th style="width: 15%;">Discount / Special</th>
                 <th style="width: 10%;">Label Tag</th>
@@ -59,15 +87,32 @@
         <tbody>
             {% for item in items %}
             <tr>
+                <!-- Index -->
                 <td class="center">{{ item.no }}</td>
+
+                <!-- Product Image -->
                 <td class="center">
                     {% if item.image_url %}
-                    <img src="{{ item.image_url }}" style="max-width: 100px; max-height: 100px; object-fit: contain;" />
+                        <img src="{{ item.image_url }}" style="max-width: 100px; max-height: 100px; object-fit: contain;" />
                     {% else %}
-                    No Image
+                        No Image
                     {% endif %}
                 </td>
-                <td>{{ item.description|safe }}</td>
+
+                <!-- Product Details -->
+                <td>
+                    <div class="name">Name: {{ item.name|default:"-" }}</div>
+                    <div class="model">Model Number: {{ item.model_number|default:"-" }}</div>
+                    <div class="spec">Spec/Capacity: {{ item.spec|default:"-" }}</div>
+                    <div class="brand">Brand: {{ item.brand_name|default:"-" }}</div>
+                    <div class="dimension">Dimension: {{ item.dimension|default:"-" }}</div><br /><br />
+                    <div class="origin">Country of Origin: {{ item.origin_country|default:"-" }}</div>
+                    <div class="certificate">Certificate: {{ item.certificate|default:"-" }}</div>
+                    
+                    <div>Description: {{ item.description|default:"-" }}</div>
+                </td>
+
+                <!-- Prices -->
                 <td class="center">{{ item.price }}</td>
                 <td class="center">{{ item.special_price }}</td>
                 <td class="center">{{ item.label_tag|safe }}</td>

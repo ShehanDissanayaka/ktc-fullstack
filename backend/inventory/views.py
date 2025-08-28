@@ -93,6 +93,7 @@ from django.utils import timezone
 from tempfile import NamedTemporaryFile
 from .models import ItemMaster
 import traceback
+from django.templatetags.static import static
 
 def safe_money(value, prefix="LKR"):
     if value is None:
@@ -142,7 +143,11 @@ def generate_price_list_pdf(request):
 
         # Render template
         template = get_template("price_list_template.html")
-        html_string = template.render({"items": items, "now": timezone.now()})
+        html_string = template.render({
+            "items": items,
+            "now": timezone.now(),
+            "logo_url": request.build_absolute_uri(static("images/logo.png"))
+        })
 
         # ✅ Stream to temp file
         with NamedTemporaryFile(delete=True) as tmp_file:
