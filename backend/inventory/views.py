@@ -107,7 +107,7 @@ def generate_price_list_pdf(request):
     items = []
 
     try:
-        for obj in ItemMaster.objects.all().order_by("ITEM_model_number"):
+        for obj in ItemMaster.objects.all().order_by("ITEM_model_number")[:20]:
             print(f"🔄 Processing item: {obj.ITEM_code}")
 
             # ✅ Safe image handling
