@@ -88,12 +88,14 @@ def generate_price_list_pdf(request):
         for obj in ItemMaster.objects.all().order_by("ITEM_model_number"):
             print(f"🔄 Processing item: {obj.ITEM_code}")
 
-            # ✅ Use Cloudinary thumbnail (small size to save memory/bandwidth)
+            # ✅ Use Cloudinary thumbnail instead of full image
             image_url = None
             if obj.image:
                 raw_url = obj.image.url
-                # Cloudinary format: replace `/upload/` with resized variant
-                image_url = raw_url.replace("/upload/", "/upload/w_150,h_150,c_fit/")
+                if "/upload/" in raw_url:
+                    image_url = raw_url.replace("/upload/", "/upload/w_150,h_150,c_fit/")
+                else:
+                    image_url = raw_url
 
             items.append({
                 "no": obj.ITEM_id,
@@ -112,17 +114,17 @@ def generate_price_list_pdf(request):
                 "notes": obj.ITEM_notes or [],
             })
 
-        # Render HTML with context
+        # Render template
         template = get_template("price_list_template.html")
         html_string = template.render({"items": items, "now": timezone.now()})
 
-        # ✅ Write to a temporary file (avoid huge memory spikes)
+        # ✅ Stream to a temp file (avoid RAM blowup)
         with NamedTemporaryFile(delete=True) as tmp_file:
             HTML(string=html_string, base_url=request.build_absolute_uri("/")).write_pdf(tmp_file.name)
             tmp_file.seek(0)
             pdf_content = tmp_file.read()
 
-        # Return response
+        # Send response
         response = HttpResponse(pdf_content, content_type="application/pdf")
         response["Content-Disposition"] = 'inline; filename="price_list.pdf"'
         return response
@@ -130,8 +132,6 @@ def generate_price_list_pdf(request):
     except Exception as e:
         print("🚨 PDF generation error:", e)
         return HttpResponse("PDF generation failed", status=500)
-
-
 
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
