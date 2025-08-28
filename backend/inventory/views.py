@@ -95,6 +95,7 @@ from .models import ItemMaster
 import traceback
 from django.templatetags.static import static
 
+
 def safe_money(value, prefix="LKR"):
     if value is None:
         return "N/A"
@@ -103,15 +104,16 @@ def safe_money(value, prefix="LKR"):
     except Exception:
         return "N/A"
 
+
 def generate_price_list_pdf(request):
     print("📥 Called: generate_price_list_pdf")
     items = []
 
     try:
-        for obj in ItemMaster.objects.all().order_by("ITEM_model_number")[:20]:
+        for obj in ItemMaster.objects.all().order_by("ITEM_model_number")[:20]:  # limit for safety
             print(f"🔄 Processing item: {obj.ITEM_code}")
 
-            # ✅ Safe image handling
+            # ✅ Safe image handling (Cloudinary thumbnails)
             image_url = None
             if obj.image:
                 try:
@@ -124,37 +126,42 @@ def generate_price_list_pdf(request):
                     print(f"⚠️ Image problem for {obj.ITEM_code}: {e}")
                     image_url = None
 
+            # ✅ Normalize field names for template
             items.append({
-                    'no': obj.ITEM_id,
-                    'image_base64': image_data,
-                    'name': obj.ITEM_name,
-                    'model_number': obj.ITEM_model_number,
-                    'spec': obj.ITEM_spec,
-                    'dimension': obj.ITEM_dimension,
-                    'brand_name': obj.ITEM_brand_name,
-                    'origin_country': obj.ITEM_origin_country,
-                    'certificate': obj.ITEM_certificate,
-                    'description': obj.ITEM_description or '',
-                    'price': f"LKR {obj.ITEM_normal_selling_price:,.2f}" if obj.ITEM_normal_selling_price else "N/A",
-                    'special_price': f"LKR {obj.ITEM_purchase_price:,.2f}" if obj.ITEM_purchase_price else "",
-                    'label_tag': obj.ITEM_name,
-                    'notes': obj.ITEM_notes or [],
+                "no": obj.ITEM_id,
+                "image_url": image_url,
+
+                "name": obj.ITEM_name or "",
+                "model_number": obj.ITEM_model_number or "",
+                "spec": obj.ITEM_spec or "",
+                "dimension": obj.ITEM_dimension or "",
+                "brand": obj.ITEM_brand_name or "",
+                "origin": obj.ITEM_origin_country or "",
+                "certificate": obj.ITEM_certificate or "",
+                "description": obj.ITEM_description or "",
+
+                "price": safe_money(obj.ITEM_normal_selling_price),
+                "special_price": safe_money(obj.ITEM_purchase_price),
+
+                "label_tag": obj.ITEM_name or "",
+                "notes": obj.ITEM_notes or [],
             })
 
-        # Render template
+        # ✅ Render template with context
         template = get_template("price_list_template.html")
         html_string = template.render({
             "items": items,
             "now": timezone.now(),
-            "logo_url": request.build_absolute_uri(static("images/logo.png"))
+            "logo_url": request.build_absolute_uri(static("images/logo.png"))  # static logo
         })
 
-        # ✅ Stream to temp file
+        # ✅ Stream to temp file for better memory usage
         with NamedTemporaryFile(delete=True) as tmp_file:
             HTML(string=html_string, base_url=request.build_absolute_uri("/")).write_pdf(tmp_file.name)
             tmp_file.seek(0)
             pdf_content = tmp_file.read()
 
+        # ✅ Return PDF response
         response = HttpResponse(pdf_content, content_type="application/pdf")
         response["Content-Disposition"] = 'inline; filename="price_list.pdf"'
         return response
@@ -163,7 +170,7 @@ def generate_price_list_pdf(request):
         print("🚨 PDF generation error:", e)
         traceback.print_exc()
         return HttpResponse("PDF generation failed", status=500)
-       
+    
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from .models import QuotationHeader
