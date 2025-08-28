@@ -98,11 +98,11 @@ def generate_price_list_pdf(request):
 
     try:
         # Build list of items and their details
-        for obj in ItemMaster.objects.all().order_by("ITEM_model_number"):
+        for obj in ItemMaster.objects.all().order_by("ITEM_model_number")[:20]:
             print(f"🔄 Processing item: {obj.ITEM_code}")
 
             # ✅ Use Cloudinary thumbnail instead of full image
-            image_url = None
+            image_url = raw_url.replace("/upload/", "/upload/w_150,h_150,c_fit/")
             if obj.image:
                 raw_url = obj.image.url
                 if "/upload/" in raw_url:
