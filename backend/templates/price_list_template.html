@@ -28,7 +28,8 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 80px; /* Push table below logo */
+            margin-top: 80px;
+            /* Push table below logo */
         }
 
         th,
@@ -52,7 +53,8 @@
         .model,
         .dimension {
             font-weight: bold;
-            color: #000; /* black bold */
+            color: #000;
+            /* black bold */
         }
 
         .spec,
@@ -60,7 +62,8 @@
         .origin,
         .certificate {
             font-weight: bold;
-            color: red; /* red bold */
+            color: red;
+            /* red bold */
         }
     </style>
 </head>
@@ -93,9 +96,9 @@
                 <!-- Product Image -->
                 <td class="center">
                     {% if item.image_url %}
-                        <img src="{{ item.image_url }}" style="max-width: 100px; max-height: 100px; object-fit: contain;" />
+                    <img src="{{ item.image_url }}" style="max-width: 100px; max-height: 100px; object-fit: contain;" />
                     {% else %}
-                        No Image
+                    No Image
                     {% endif %}
                 </td>
 
@@ -105,10 +108,9 @@
                     <div class="model">Model Number: {{ item.model_number|default:"-" }}</div>
                     <div class="spec">Spec/Capacity: {{ item.spec|default:"-" }}</div>
                     <div class="brand">Brand: {{ item.brand_name|default:"-" }}</div>
-                    <div class="dimension">Dimension: {{ item.dimension|default:"-" }}</div><br /><br />
                     <div class="origin">Country of Origin: {{ item.origin_country|default:"-" }}</div>
                     <div class="certificate">Certificate: {{ item.certificate|default:"-" }}</div>
-                    
+                    <div class="dimension">Dimension: {{ item.dimension|default:"-" }}</div>
                     <div>Description: {{ item.description|default:"-" }}</div>
                 </td>
 
