@@ -70,6 +70,16 @@ from .models import ItemMaster
 from django.utils import timezone
 import base64, requests
 
+
+def safe_money(value, prefix="LKR"):
+    if value is None:
+        return "N/A"
+    try:
+        return f"{prefix} {float(value):,.2f}"
+    except Exception:
+        return "N/A"
+
+
 def generate_price_list_pdf(request):
     print("📥 Called: generate_price_list_pdf")
     items = []
@@ -90,15 +100,21 @@ def generate_price_list_pdf(request):
             except Exception as e:
                 print(f"🚨 Error loading image for {obj.ITEM_code}: {e}")
 
-            description = f"<b>{obj.ITEM_name}</b><br/>{obj.ITEM_description or ''}"
-
             items.append({
                 'no': obj.ITEM_id,
                 'image_base64': image_data,
-                'description': description,
-                'price': f"LKR {obj.ITEM_normal_selling_price:,.2f}",
-                'special_price': obj.ITEM_purchase_price,
-                'label_tag': obj.ITEM_name,
+                'name': obj.ITEM_name or "",
+                'model_number': obj.ITEM_model_number or "",
+                'spec': obj.ITEM_spec or "",
+                'dimension': obj.ITEM_dimension or "",
+                'brand_name': obj.ITEM_brand_name or "",
+                'origin_country': obj.ITEM_origin_country or "",
+                'certificate': obj.ITEM_certificate or "",
+                'description': obj.ITEM_description or "",
+                'price': safe_money(obj.ITEM_normal_selling_price),
+                'special_price': safe_money(obj.ITEM_purchase_price),
+                'label_tag': obj.ITEM_name or "",
+                'notes': obj.ITEM_notes or [],
             })
 
         template = get_template("price_list_template.html")
@@ -112,6 +128,7 @@ def generate_price_list_pdf(request):
     except Exception as e:
         print("🚨 PDF generation error:", e)
         return HttpResponse("PDF generation failed", status=500)
+
 
 
 
