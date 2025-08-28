@@ -35,12 +35,6 @@
             text-align: center;
         }
 
-        .yellow {
-            background-color: yellow;
-            text-align: center;
-            font-weight: bold;
-        }
-
         .center {
             text-align: center;
         }
@@ -48,19 +42,18 @@
 </head>
 
 <body>
-
     <h1>KTC INVENTORY - PRICE LIST</h1>
     <p>Generated: {{ now|date:"Y-m-d H:i" }}</p>
 
     <table>
         <thead>
             <tr>
-                <th>No</th>
-                <th>IMAGE</th>
-                <th>DESCRIPTION</th>
-                <th>UNIT PRICE</th>
-                <th>DISCOUNT/SPECIAL PRICE</th>
-                <th>LABEL TAG / INVOICE</th>
+                <th style="width: 5%;">No</th>
+                <th style="width: 15%;">Image</th>
+                <th style="width: 40%;">Description</th>
+                <th style="width: 15%;">Unit Price</th>
+                <th style="width: 15%;">Discount / Special</th>
+                <th style="width: 10%;">Label Tag</th>
             </tr>
         </thead>
         <tbody>
@@ -68,9 +61,8 @@
             <tr>
                 <td class="center">{{ item.no }}</td>
                 <td class="center">
-                    {% if item.image_base64 %}
-                    <img src="data:image/png;base64,{{ item.image_base64 }}"
-                        style="max-width: 100px; max-height: 100px; object-fit: contain;" />
+                    {% if item.image_url %}
+                    <img src="{{ item.image_url }}" style="max-width: 100px; max-height: 100px; object-fit: contain;" />
                     {% else %}
                     No Image
                     {% endif %}
@@ -83,7 +75,6 @@
             {% endfor %}
         </tbody>
     </table>
-
 </body>
 
 </html>

@@ -68,7 +68,6 @@ from weasyprint import HTML
 from django.http import HttpResponse
 from .models import ItemMaster
 from django.utils import timezone
-import base64, requests
 
 
 def safe_money(value, prefix="LKR"):
@@ -85,51 +84,42 @@ def generate_price_list_pdf(request):
     items = []
 
     try:
-        for obj in ItemMaster.objects.all().order_by('ITEM_model_number'):
+        for obj in ItemMaster.objects.all().order_by("ITEM_model_number"):
             print(f"🔄 Processing item: {obj.ITEM_code}")
 
-            image_data = None
-            try:
-                if obj.image:
-                    image_url = request.build_absolute_uri(obj.image.url)
-                    response = requests.get(image_url)
-                    if response.status_code == 200:
-                        image_data = base64.b64encode(response.content).decode('utf-8')
-                    else:
-                        print(f"⚠️ Could not fetch image: {response.status_code}")
-            except Exception as e:
-                print(f"🚨 Error loading image for {obj.ITEM_code}: {e}")
+            # 🔑 ONLY use the Cloudinary (or storage) URL directly — no requests.get / base64
+            image_url = obj.image.url if obj.image else None
 
             items.append({
-                'no': obj.ITEM_id,
-                'image_base64': image_data,
-                'name': obj.ITEM_name or "",
-                'model_number': obj.ITEM_model_number or "",
-                'spec': obj.ITEM_spec or "",
-                'dimension': obj.ITEM_dimension or "",
-                'brand_name': obj.ITEM_brand_name or "",
-                'origin_country': obj.ITEM_origin_country or "",
-                'certificate': obj.ITEM_certificate or "",
-                'description': obj.ITEM_description or "",
-                'price': safe_money(obj.ITEM_normal_selling_price),
-                'special_price': safe_money(obj.ITEM_purchase_price),
-                'label_tag': obj.ITEM_name or "",
-                'notes': obj.ITEM_notes or [],
+                "no": obj.ITEM_id,
+                "image_url": image_url,   # pass URL directly!
+                "name": obj.ITEM_name or "",
+                "model_number": obj.ITEM_model_number or "",
+                "spec": obj.ITEM_spec or "",
+                "dimension": obj.ITEM_dimension or "",
+                "brand_name": obj.ITEM_brand_name or "",
+                "origin_country": obj.ITEM_origin_country or "",
+                "certificate": obj.ITEM_certificate or "",
+                "description": obj.ITEM_description or "",
+                "price": safe_money(obj.ITEM_normal_selling_price),
+                "special_price": safe_money(obj.ITEM_purchase_price),
+                "label_tag": obj.ITEM_name or "",
+                "notes": obj.ITEM_notes or [],
             })
 
         template = get_template("price_list_template.html")
         html_string = template.render({"items": items, "now": timezone.now()})
-        pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
 
-        response = HttpResponse(pdf_file, content_type='application/pdf')
-        response['Content-Disposition'] = 'inline; filename="price_list.pdf"'
+        # ✅ important: set base_url to request.build_absolute_uri("/") for WeasyPrint asset resolving
+        pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri("/")).write_pdf()
+
+        response = HttpResponse(pdf_file, content_type="application/pdf")
+        response["Content-Disposition"] = 'inline; filename="price_list.pdf"'
         return response
 
     except Exception as e:
         print("🚨 PDF generation error:", e)
         return HttpResponse("PDF generation failed", status=500)
-
-
 
 
 
