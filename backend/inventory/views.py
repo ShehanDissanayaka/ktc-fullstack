@@ -68,6 +68,7 @@ from weasyprint import HTML
 from django.http import HttpResponse
 from .models import ItemMaster
 from django.utils import timezone
+from tempfile import NamedTemporaryFile
 
 
 def safe_money(value, prefix="LKR"):
@@ -87,12 +88,16 @@ def generate_price_list_pdf(request):
         for obj in ItemMaster.objects.all().order_by("ITEM_model_number"):
             print(f"🔄 Processing item: {obj.ITEM_code}")
 
-            # 🔑 ONLY use the Cloudinary (or storage) URL directly — no requests.get / base64
-            image_url = obj.image.url if obj.image else None
+            # ✅ Use Cloudinary thumbnail (small size to save memory/bandwidth)
+            image_url = None
+            if obj.image:
+                raw_url = obj.image.url
+                # Cloudinary format: replace `/upload/` with resized variant
+                image_url = raw_url.replace("/upload/", "/upload/w_150,h_150,c_fit/")
 
             items.append({
                 "no": obj.ITEM_id,
-                "image_url": image_url,   # pass URL directly!
+                "image_url": image_url,
                 "name": obj.ITEM_name or "",
                 "model_number": obj.ITEM_model_number or "",
                 "spec": obj.ITEM_spec or "",
@@ -107,20 +112,24 @@ def generate_price_list_pdf(request):
                 "notes": obj.ITEM_notes or [],
             })
 
+        # Render HTML with context
         template = get_template("price_list_template.html")
         html_string = template.render({"items": items, "now": timezone.now()})
 
-        # ✅ important: set base_url to request.build_absolute_uri("/") for WeasyPrint asset resolving
-        pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri("/")).write_pdf()
+        # ✅ Write to a temporary file (avoid huge memory spikes)
+        with NamedTemporaryFile(delete=True) as tmp_file:
+            HTML(string=html_string, base_url=request.build_absolute_uri("/")).write_pdf(tmp_file.name)
+            tmp_file.seek(0)
+            pdf_content = tmp_file.read()
 
-        response = HttpResponse(pdf_file, content_type="application/pdf")
+        # Return response
+        response = HttpResponse(pdf_content, content_type="application/pdf")
         response["Content-Disposition"] = 'inline; filename="price_list.pdf"'
         return response
 
     except Exception as e:
         print("🚨 PDF generation error:", e)
         return HttpResponse("PDF generation failed", status=500)
-
 
 
 
