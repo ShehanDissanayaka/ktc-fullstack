@@ -14,6 +14,17 @@
         /* Styles */
         .name, .model, .dimension { font-weight: bold; color: black; }
         .spec, .brand, .origin, .certificate { font-weight: bold; color: red; }
+
+        /* Custom for bigger images */
+        .image-col {
+            width: 200px;              /* make column wider */
+            text-align: center;
+        }
+        .product-image {
+            max-width: 180px;          /* allow bigger width */
+            max-height: 160px;         /* allow bigger height */
+            object-fit: contain;
+        }
     </style>
 </head>
 <body>
@@ -25,7 +36,7 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>Image</th>
+                <th class="image-col">Image</th>   <!-- wider -->
                 <th>Details</th>
                 <th>Unit Price</th>
                 <th>Discount / Special</th>
@@ -39,10 +50,10 @@
                 <td class="center">{{ item.no }}</td>
 
                 <!-- Product Image -->
-                <td class="center">
+                <td class="image-col">
                     {% if item.image_base64 %}
                         <img src="data:image/png;base64,{{ item.image_base64 }}"
-                             style="max-width: 100px; max-height: 100px; object-fit: contain;" />
+                             class="product-image" />
                     {% else %} No Image {% endif %}
                 </td>
 
