@@ -90,10 +90,8 @@ from django.template.loader import get_template
 from weasyprint import HTML
 from django.http import HttpResponse
 from django.utils import timezone
-from tempfile import NamedTemporaryFile
 from .models import ItemMaster
-import traceback
-from django.templatetags.static import static
+import base64, requests, traceback
 
 
 def safe_money(value, prefix="LKR"):
@@ -110,59 +108,48 @@ def generate_price_list_pdf(request):
     items = []
 
     try:
-        for obj in ItemMaster.objects.all().order_by("ITEM_model_number")[:20]:  # limit for safety
-            print(f"🔄 Processing item: {obj.ITEM_code}")
+        for obj in ItemMaster.objects.all().order_by('ITEM_model_number'):
 
-            # ✅ Safe image handling (Cloudinary thumbnails)
-            image_url = None
-            if obj.image:
-                try:
-                    raw_url = obj.image.url
-                    if raw_url and "/upload/" in raw_url:
-                        image_url = raw_url.replace("/upload/", "/upload/w_150,h_150,c_fit/")
+            # ✅ Convert image to base64 (stable for WeasyPrint)
+            image_data = None
+            try:
+                if obj.image:
+                    image_url = request.build_absolute_uri(obj.image.url)
+                    response = requests.get(image_url)
+                    if response.status_code == 200:
+                        image_data = base64.b64encode(response.content).decode('utf-8')
                     else:
-                        image_url = raw_url
-                except Exception as e:
-                    print(f"⚠️ Image problem for {obj.ITEM_code}: {e}")
-                    image_url = None
+                        print(f"⚠️ Could not fetch image for {obj.ITEM_code} (status {response.status_code})")
+            except Exception as e:
+                print(f"🚨 Error loading image for {obj.ITEM_code}: {e}")
 
-            # ✅ Normalize field names for template
+            # ✅ Normalized fields (avoid brand_name vs brand mismatch)
             items.append({
                 "no": obj.ITEM_id,
-                "image_url": image_url,
-
+                "image_base64": image_data,
                 "name": obj.ITEM_name or "",
                 "model_number": obj.ITEM_model_number or "",
                 "spec": obj.ITEM_spec or "",
                 "dimension": obj.ITEM_dimension or "",
-                "brand": obj.ITEM_brand_name or "",
-                "origin": obj.ITEM_origin_country or "",
+                "brand_name": obj.ITEM_brand_name or "",
+                "origin_country": obj.ITEM_origin_country or "",
                 "certificate": obj.ITEM_certificate or "",
                 "description": obj.ITEM_description or "",
-
                 "price": safe_money(obj.ITEM_normal_selling_price),
                 "special_price": safe_money(obj.ITEM_purchase_price),
-
                 "label_tag": obj.ITEM_name or "",
                 "notes": obj.ITEM_notes or [],
             })
 
-        # ✅ Render template with context
+        # ✅ Render template
         template = get_template("price_list_template.html")
         html_string = template.render({
             "items": items,
-            "now": timezone.now(),
-            "logo_url": request.build_absolute_uri(static("images/logo.png"))  # static logo
+            "now": timezone.now()
         })
+        pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
 
-        # ✅ Stream to temp file for better memory usage
-        with NamedTemporaryFile(delete=True) as tmp_file:
-            HTML(string=html_string, base_url=request.build_absolute_uri("/")).write_pdf(tmp_file.name)
-            tmp_file.seek(0)
-            pdf_content = tmp_file.read()
-
-        # ✅ Return PDF response
-        response = HttpResponse(pdf_content, content_type="application/pdf")
+        response = HttpResponse(pdf_file, content_type="application/pdf")
         response["Content-Disposition"] = 'inline; filename="price_list.pdf"'
         return response
 
@@ -170,7 +157,8 @@ def generate_price_list_pdf(request):
         print("🚨 PDF generation error:", e)
         traceback.print_exc()
         return HttpResponse("PDF generation failed", status=500)
-    
+        
+          
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from .models import QuotationHeader
