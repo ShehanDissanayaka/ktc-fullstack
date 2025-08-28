@@ -125,20 +125,26 @@ def generate_price_list_pdf(request):
                     image_url = None
 
             items.append({
-                "no": obj.ITEM_id,
-                "image_url": image_url,
-                "name": obj.ITEM_name or "",
-                "model_number": obj.ITEM_model_number or "",
-                "spec": obj.ITEM_spec or "",
-                "dimension": obj.ITEM_dimension or "",
-                "brand_name": obj.ITEM_brand_name or "",
-                "origin_country": obj.ITEM_origin_country or "",
-                "certificate": obj.ITEM_certificate or "",
-                "description": obj.ITEM_description or "",
-                "price": safe_money(obj.ITEM_normal_selling_price),
-                "special_price": safe_money(obj.ITEM_purchase_price),
-                "label_tag": obj.ITEM_name or "",
-                "notes": obj.ITEM_notes or [],
+               "no": obj.ITEM_id,
+               "image_url": image_url,
+
+    # normalize field names to match template
+               "name": obj.ITEM_name or "",
+               "model_number": obj.ITEM_model_number or "",
+               "spec": obj.ITEM_spec or "",
+               "dimension": obj.ITEM_dimension or "",
+               "brand": obj.ITEM_brand_name or "",
+               "origin": obj.ITEM_origin_country or "",
+               "certificate": obj.ITEM_certificate or "",
+               "description": obj.ITEM_description or "",
+
+    # money-safe formatted values
+               "price": safe_money(obj.ITEM_normal_selling_price),
+               "special_price": safe_money(obj.ITEM_purchase_price),
+
+    # others
+               "label_tag": obj.ITEM_name or "",
+               "notes": obj.ITEM_notes or [],
             })
 
         # Render template
