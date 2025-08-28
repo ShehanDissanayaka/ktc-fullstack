@@ -66,12 +66,18 @@ def generate_item_pdf(request, id):
 from django.template.loader import get_template
 from weasyprint import HTML
 from django.http import HttpResponse
-from .models import ItemMaster
 from django.utils import timezone
 from tempfile import NamedTemporaryFile
+from .models import ItemMaster
+import traceback
 
 
 def safe_money(value, prefix="LKR"):
+    """
+    Safely format numeric values to currency style.
+    Example: 1234.5 -> 'LKR 1,234.50'
+    If value is None or invalid, return 'N/A'.
+    """
     if value is None:
         return "N/A"
     try:
@@ -81,10 +87,17 @@ def safe_money(value, prefix="LKR"):
 
 
 def generate_price_list_pdf(request):
+    """
+    Generate a price list PDF using WeasyPrint.
+    - Uses Cloudinary thumbnails instead of full images.
+    - Streams PDF to a temporary file to avoid Render worker OOM kills.
+    - Logs full exception trace for debugging.
+    """
     print("📥 Called: generate_price_list_pdf")
     items = []
 
     try:
+        # Build list of items and their details
         for obj in ItemMaster.objects.all().order_by("ITEM_model_number"):
             print(f"🔄 Processing item: {obj.ITEM_code}")
 
@@ -93,6 +106,7 @@ def generate_price_list_pdf(request):
             if obj.image:
                 raw_url = obj.image.url
                 if "/upload/" in raw_url:
+                    # ask Cloudinary for a 150x150 "fit" version
                     image_url = raw_url.replace("/upload/", "/upload/w_150,h_150,c_fit/")
                 else:
                     image_url = raw_url
@@ -114,25 +128,33 @@ def generate_price_list_pdf(request):
                 "notes": obj.ITEM_notes or [],
             })
 
-        # Render template
+        # Render HTML string with template
         template = get_template("price_list_template.html")
-        html_string = template.render({"items": items, "now": timezone.now()})
+        html_string = template.render({
+            "items": items,
+            "now": timezone.now()
+        })
 
-        # ✅ Stream to a temp file (avoid RAM blowup)
+        # ✅ Stream directly to a file to avoid memory spike
         with NamedTemporaryFile(delete=True) as tmp_file:
-            HTML(string=html_string, base_url=request.build_absolute_uri("/")).write_pdf(tmp_file.name)
-            tmp_file.seek(0)
+            HTML(
+                string=html_string,
+                base_url=request.build_absolute_uri("/")
+            ).write_pdf(tmp_file.name)
+
+            tmp_file.seek(0)  # rewind file pointer
             pdf_content = tmp_file.read()
 
-        # Send response
+        # Build HTTP response
         response = HttpResponse(pdf_content, content_type="application/pdf")
         response["Content-Disposition"] = 'inline; filename="price_list.pdf"'
         return response
 
     except Exception as e:
         print("🚨 PDF generation error:", e)
+        traceback.print_exc()   # log full traceback in Render logs
         return HttpResponse("PDF generation failed", status=500)
-
+    
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from .models import QuotationHeader
