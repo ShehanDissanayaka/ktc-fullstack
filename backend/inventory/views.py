@@ -125,26 +125,20 @@ def generate_price_list_pdf(request):
                     image_url = None
 
             items.append({
-               "no": obj.ITEM_id,
-               "image_url": image_url,
-
-    # normalize field names to match template
-               "name": obj.ITEM_name or "",
-               "model_number": obj.ITEM_model_number or "",
-               "spec": obj.ITEM_spec or "",
-               "dimension": obj.ITEM_dimension or "",
-               "brand": obj.ITEM_brand_name or "",
-               "origin": obj.ITEM_origin_country or "",
-               "certificate": obj.ITEM_certificate or "",
-               "description": obj.ITEM_description or "",
-
-    # money-safe formatted values
-               "price": safe_money(obj.ITEM_normal_selling_price),
-               "special_price": safe_money(obj.ITEM_purchase_price),
-
-    # others
-               "label_tag": obj.ITEM_name or "",
-               "notes": obj.ITEM_notes or [],
+                    'no': obj.ITEM_id,
+                    'image_base64': image_data,
+                    'name': obj.ITEM_name,
+                    'model_number': obj.ITEM_model_number,
+                    'spec': obj.ITEM_spec,
+                    'dimension': obj.ITEM_dimension,
+                    'brand_name': obj.ITEM_brand_name,
+                    'origin_country': obj.ITEM_origin_country,
+                    'certificate': obj.ITEM_certificate,
+                    'description': obj.ITEM_description or '',
+                    'price': f"LKR {obj.ITEM_normal_selling_price:,.2f}" if obj.ITEM_normal_selling_price else "N/A",
+                    'special_price': f"LKR {obj.ITEM_purchase_price:,.2f}" if obj.ITEM_purchase_price else "",
+                    'label_tag': obj.ITEM_name,
+                    'notes': obj.ITEM_notes or [],
             })
 
         # Render template

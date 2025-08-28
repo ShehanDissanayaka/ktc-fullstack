@@ -104,20 +104,25 @@
 
                 <!-- Product Details -->
                 <td>
-                    <div class="name">Name: {{ item.name|default:"-" }}</div>
-                    <div class="model">Model Number: {{ item.model_number|default:"-" }}</div>
-                    <div class="spec">Spec/Capacity: {{ item.spec|default:"-" }}</div>
-                    <div class="brand">Brand: {{ item.brand|default:"-" }}</div>
-                    <div class="origin">Country of Origin: {{ item.origin|default:"-" }}</div>
-                    <div class="certificate">Certificate: {{ item.certificate|default:"-" }}</div>
-                    <div class="dimension">Dimension: {{ item.dimension|default:"-" }}</div>
-                    <div>Description: {{ item.description|default:"-" }}</div>
+                    <span class="name">{{ item.name }}</span><br />
+                    <span class="model">Model: {{ item.model_number }}</span><br />
+                    <span class="brand">Brand: {{ item.brand_name }}</span><br />
+                    <span class="dimension">Dimension: {{ item.dimension }}</span><br /><br /><br />
+                    <span class="spec">Spec/Capacity: {{ item.spec }}</span><br />
+                    <span class="origin">Country of Origin: {{ item.origin_country }}</span><br />
+                    <span class="certificate">Certificate: {{ item.certificate }}</span><br />
+
+
                 </td>
 
                 <!-- Prices -->
                 <td class="center">{{ item.price }}</td>
                 <td class="center">{{ item.special_price }}</td>
-                <td class="center">{{ item.label_tag|safe }}</td>
+                <td class="center">
+                    <span class="name">{{ item.name }}</span><br />
+                    <span class="model">Model: {{ item.model_number }}</span><br />
+                    {{ item.price }}
+                </td>
             </tr>
             {% endfor %}
         </tbody>
