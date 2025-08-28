@@ -57,6 +57,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://bright-marshmallow-2675ab.netlify.app",
 ]
 
+
+
 # ✅ Allow PDF blob download (binary data)
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "content-disposition",  # required for file downloads like PDFs
